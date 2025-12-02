@@ -43,7 +43,7 @@ interface ChatMessage {
   content: string;
 }
 
-interface TravelAppProps {
+interface CreateItineraryProps {
   user: User;
 }
 
@@ -66,7 +66,7 @@ const templates = [
   },
 ];
 
-export function TravelApp({ user }: TravelAppProps) {
+export function CreateItinerary({ user }: CreateItineraryProps) {
   const supabase = createClient();
 
   const [destino, setDestino] = useState("");

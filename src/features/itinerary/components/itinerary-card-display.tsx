@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,43 +10,47 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { ChecklistDialog } from "./checklist-dialog"
+} from "@/components/ui/dialog";
+import { ChecklistDialog } from "../../../components/checklist-dialog";
 
 interface ItineraryCardDisplayProps {
-  resultado: string
-  destino: string
-  onGeneratePDF: () => void
+  result: string;
+  destination: string;
+  onGeneratePDF: () => void;
 }
 
-export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: ItineraryCardDisplayProps) {
-  const [showThankYou, setShowThankYou] = useState(false)
-  const [showChecklistPrompt, setShowChecklistPrompt] = useState(false)
-  const [showChecklist, setShowChecklist] = useState(false)
-  const [hasShownDialogs, setHasShownDialogs] = useState(false)
+export function ItineraryCardDisplay({
+  result,
+  destination,
+  onGeneratePDF,
+}: ItineraryCardDisplayProps) {
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [showChecklistPrompt, setShowChecklistPrompt] = useState(false);
+  const [showChecklist, setShowChecklist] = useState(false);
+  const [hasShownDialogs, setHasShownDialogs] = useState(false);
 
   const handleCardClick = () => {
     if (!hasShownDialogs) {
-      setShowThankYou(true)
-      setHasShownDialogs(true)
+      setShowThankYou(true);
+      setHasShownDialogs(true);
     }
-  }
+  };
 
   const handleThankYouClose = () => {
-    setShowThankYou(false)
+    setShowThankYou(false);
     setTimeout(() => {
-      setShowChecklistPrompt(true)
-    }, 300)
-  }
+      setShowChecklistPrompt(true);
+    }, 300);
+  };
 
   const handleChecklistResponse = (wantsChecklist: boolean) => {
-    setShowChecklistPrompt(false)
+    setShowChecklistPrompt(false);
     if (wantsChecklist) {
       setTimeout(() => {
-        setShowChecklist(true)
-      }, 300)
+        setShowChecklist(true);
+      }, 300);
     }
-  }
+  };
 
   return (
     <>
@@ -60,8 +64,8 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
           </CardTitle>
           <Button
             onClick={(e) => {
-              e.stopPropagation()
-              onGeneratePDF()
+              e.stopPropagation();
+              onGeneratePDF();
             }}
             size="sm"
             variant="outline"
@@ -71,7 +75,10 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="itinerary-display" dangerouslySetInnerHTML={{ __html: resultado }} />
+          <div
+            className="itinerary-display"
+            dangerouslySetInnerHTML={{ __html: result }}
+          />
         </CardContent>
       </Card>
 
@@ -90,7 +97,7 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
           <DialogFooter className="sm:justify-center">
             <Button
               onClick={handleThankYouClose}
-              className="bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-600 hover:to-cyan-500 transition-all hover:scale-105"
+              className="bg-linear-to-r from-sky-500 to-cyan-400 hover:from-sky-600 hover:to-cyan-500 transition-all hover:scale-105"
             >
               Continuar
             </Button>
@@ -107,8 +114,8 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
               Gerar checklist de documentos?
             </DialogTitle>
             <DialogDescription className="text-center text-base pt-2">
-              Podemos criar uma lista personalizada de documentos necessários para sua viagem para{" "}
-              <strong>{destino}</strong>.
+              Podemos criar uma lista personalizada de documentos necessários
+              para sua viagem para <strong>{destination}</strong>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center gap-3">
@@ -121,7 +128,7 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
             </Button>
             <Button
               onClick={() => handleChecklistResponse(true)}
-              className="bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-600 hover:to-cyan-500 transition-all hover:scale-105"
+              className="bg-linear-to-r from-sky-500 to-cyan-400 hover:from-sky-600 hover:to-cyan-500 transition-all hover:scale-105"
             >
               Sim
             </Button>
@@ -130,7 +137,11 @@ export function ItineraryCardDisplay({ resultado, destino, onGeneratePDF }: Itin
       </Dialog>
 
       {/* Checklist Dialog */}
-      <ChecklistDialog open={showChecklist} onOpenChange={setShowChecklist} destino={destino} />
+      <ChecklistDialog
+        open={showChecklist}
+        onOpenChange={setShowChecklist}
+        destino={destination}
+      />
     </>
-  )
+  );
 }
