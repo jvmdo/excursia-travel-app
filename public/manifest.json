@@ -2,7 +2,7 @@
   "name": "Travelapp by Excursia Viagens",
   "short_name": "Travelapp",
   "description": "Crie roteiros personalizados com inteligência artificial",
-  "start_url": "/app",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0ea5e9",
   "theme_color": "#0ea5e9",
@@ -41,7 +41,7 @@
       "name": "Novo Roteiro",
       "short_name": "Novo",
       "description": "Criar novo roteiro de viagem",
-      "url": "/app",
+      "url": "/",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
