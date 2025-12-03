@@ -1,35 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { ItineraryCardDisplay } from "@/features/itinerary/components/itinerary-card-display";
 
 export function ItineraryResult({
-  html,
-  destination,
+  itinerary,
   onGeneratePDF,
 }: {
-  html: string;
-  destination: string;
+  itinerary: ItineraryData;
   onGeneratePDF: () => void;
 }) {
-  if (!html) return null;
-
   return (
     <div className="mt-6">
       <ItineraryCardDisplay
-        result={html}
-        destination={destination}
+        itinerary={itinerary}
         onGeneratePDF={onGeneratePDF}
       />
-
-      <div className="flex justify-end mt-4">
-        <Button
-          onClick={onGeneratePDF}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6"
-        >
-          📄 Baixar PDF
-        </Button>
-      </div>
     </div>
   );
 }

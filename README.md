@@ -9,16 +9,18 @@
   - Warn about items not checked
   - Message if all items are checked
   - Fix: Transparent background when opening
+  - Feat: local storage
   - Feat: adapt according to travel type
+  - Feat: database
 
 - Itinerary
+  - Dollar to Real
   - Remove cursor pointer
   - Remove leading asterisk, make time bold
-  - Dollar to Real
 
-- Form
-  - Change "Dias de viagem" para "Quantos dias de viagem?"
-  - Preferences placeholder
+- Itinerary list
+  - Feat: local storage
+  - Feat: database
 
 - Toast
   - Fix: itinerary glitches when toast dismiss
@@ -33,6 +35,9 @@
 - PDF
   - First page is empty (only title is written down)
 
+- Form
+  - Loading while generating itinerary: it should display a beautiful gradient loading bar placeholder with animation that seems something impressive is cooking;
+
 - OnProfit Webhook API
 
 - PWA
@@ -46,14 +51,14 @@
   - excursia-roteiros-de-viagem.vercel.app
   - excursia-itinerary-maker.vercel.app
 
+- Groq
+  - Quantos tokens disponíveis?
+
 ### Gepeto
 
 - Bugs
   - PDF output is not pretty formatted as is was before refactor
   - Toast validation in form not showing at all. Replace Toaster by shadcn Sonner and fix the problems.
-
-- Improve
-  - Loading while generating itinerary: it should display a beautiful gradient loading bar placeholder as before;
 
 - Propose DX and UX improvement using react and next latest features
   - server actions?

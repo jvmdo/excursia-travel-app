@@ -5,18 +5,15 @@ import { ItineraryForm } from "@/features/itinerary/components/itinerary-form";
 import { ItineraryResult } from "@/features/itinerary/components/itinerary-result";
 import { SavedItineraryList } from "@/features/itinerary/components/saved-itinerary-list";
 import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
-import {
-  Itinerary,
-  useSavedItineraries,
-} from "@/features/itinerary/hooks/use-saved-itineraries";
+import { useSavedItineraries } from "@/features/itinerary/hooks/use-saved-itineraries";
 import { useState } from "react";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 
 export function ItineraryFeature() {
   const toast = useToast();
-  const [loadHtml, setLoadHtml] = useState<string | null>(null);
+  const [itinerary, setItinerary] = useState<ItineraryData>();
 
-  const { isLoading, resultHtml, currentDestination, generate } =
-    useGenerateItinerary();
+  const { isLoading, generate } = useGenerateItinerary();
 
   const { saved, add, remove, load } = useSavedItineraries();
 
@@ -26,16 +23,14 @@ export function ItineraryFeature() {
     preferences: string;
   }) => {
     try {
-      const html = await generate(values);
+      const newItinerary = await generate(values);
 
-      setLoadHtml(null);
-      add({
-        id: crypto.randomUUID(),
-        destination: values.destination,
-        days: values.days,
-        html,
-        date: new Date().toISOString(),
-      });
+      if (!newItinerary) {
+        throw new Error();
+      }
+
+      setItinerary(newItinerary);
+      add(newItinerary);
 
       toast.toast({
         title: "✨ Roteiro gerado!",
@@ -50,36 +45,32 @@ export function ItineraryFeature() {
     }
   };
 
-  const handleGeneratePDF = () => {
-    if (!resultHtml) {
+  // const handleGeneratePDF = () => {
+  //   const newWindow = window.open("", "", "width=800,height=600");
+  //   if (!newWindow) return;
+
+  //   newWindow.document.write(resultHtml);
+  //   newWindow.document.close();
+  //   newWindow.print();
+  // };
+
+  const handleLoad = (id: string) => {
+    const itinerary = load(id);
+
+    if (!itinerary) {
       toast.toast({
-        title: "⚠️ Nenhum roteiro disponível",
-        description: "Gere um roteiro antes de fazer download.",
+        title: "❌ Erro carregar roteiro",
+        description: "Roteiro não encontrado no dispositivo",
         variant: "destructive",
       });
       return;
     }
 
-    const newWindow = window.open("", "", "width=800,height=600");
-    if (!newWindow) return;
-
-    newWindow.document.write(resultHtml);
-    newWindow.document.close();
-    newWindow.print();
-  };
-
-  const handleLoad = (id: string) => {
-    const item = load(id);
-
-    if (!item) {
-      return;
-    }
-
-    setLoadHtml(item.html);
+    setItinerary(itinerary);
 
     toast.toast({
       title: "📂 Roteiro carregado",
-      description: `Exibindo itinerário para ${item.destination}.`,
+      description: `Exibindo itinerário para ${itinerary.destination}.`,
     });
   };
 
@@ -87,11 +78,9 @@ export function ItineraryFeature() {
     <div className="space-y-8 mt-6">
       <ItineraryForm onSubmit={handleSubmit} isLoading={isLoading} />
 
-      <ItineraryResult
-        html={loadHtml ?? resultHtml}
-        destination={currentDestination}
-        onGeneratePDF={handleGeneratePDF}
-      />
+      {itinerary && (
+        <ItineraryResult itinerary={itinerary} onGeneratePDF={() => {}} />
+      )}
 
       <SavedItineraryList
         itineraries={saved}

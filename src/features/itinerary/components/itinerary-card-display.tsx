@@ -12,16 +12,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ChecklistDialog } from "../../../components/checklist-dialog";
+import { MarkdownRenderer } from "@/features/itinerary/components/markdown-renderer";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 
 interface ItineraryCardDisplayProps {
-  result: string;
-  destination: string;
+  itinerary: ItineraryData;
   onGeneratePDF: () => void;
 }
 
 export function ItineraryCardDisplay({
-  result,
-  destination,
+  itinerary,
   onGeneratePDF,
 }: ItineraryCardDisplayProps) {
   const [showThankYou, setShowThankYou] = useState(false);
@@ -75,10 +75,11 @@ export function ItineraryCardDisplay({
           </Button>
         </CardHeader>
         <CardContent>
-          <div
-            className="itinerary-display"
-            dangerouslySetInnerHTML={{ __html: result }}
-          />
+          <div className="space-y-6">
+            {itinerary.daysList.map((day) => (
+              <MarkdownRenderer key={day.day} markdown={day.description} />
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -115,7 +116,7 @@ export function ItineraryCardDisplay({
             </DialogTitle>
             <DialogDescription className="text-center text-base pt-2">
               Podemos criar uma lista personalizada de documentos necessários
-              para sua viagem para <strong>{destination}</strong>.
+              para sua viagem para <strong>{itinerary.destination}</strong>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center gap-3">
@@ -140,7 +141,7 @@ export function ItineraryCardDisplay({
       <ChecklistDialog
         open={showChecklist}
         onOpenChange={setShowChecklist}
-        destino={destination}
+        destino={itinerary.destination}
       />
     </>
   );

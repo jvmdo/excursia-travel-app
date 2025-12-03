@@ -1,15 +1,8 @@
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { useEffect, useState, useCallback } from "react";
 
-export interface Itinerary {
-  id: string;
-  destination: string;
-  days: number;
-  html: string;
-  date: string;
-}
-
 export function useSavedItineraries() {
-  const [saved, setSaved] = useState<Itinerary[]>([]);
+  const [saved, setSaved] = useState<ItineraryData[]>([]);
 
   // Load from localStorage only on client
   useEffect(() => {
@@ -25,7 +18,7 @@ export function useSavedItineraries() {
   }, []);
 
   // Writes to localStorage
-  const persist = useCallback((items: Itinerary[]) => {
+  const persist = useCallback((items: ItineraryData[]) => {
     setSaved(items);
     if (typeof window !== "undefined") {
       localStorage.setItem("itineraries", JSON.stringify(items));
@@ -33,7 +26,7 @@ export function useSavedItineraries() {
   }, []);
 
   const add = useCallback(
-    (item: Itinerary) => {
+    (item: ItineraryData) => {
       const updated = [item, ...saved].slice(0, 10);
       persist(updated);
     },
@@ -49,7 +42,7 @@ export function useSavedItineraries() {
   );
 
   const load = useCallback(
-    (id: string): Itinerary | undefined => {
+    (id: string): ItineraryData | undefined => {
       return saved.find((itinerary) => itinerary.id === id);
     },
     [saved]

@@ -1,11 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
+const ItineraryDaySchema = z.object({
+  day: z.number(),
+  title: z.string(),
+  description: z.string(), // markdown
+  tips: z.array(z.string()).optional(),
+});
+
+export const ItineraryDataSchema = z.object({
+  id: z.string(),
+  destination: z.string(),
+  days: z.number(),
+  daysList: z.array(ItineraryDaySchema),
+  createdAt: z.number().optional(),
+});
+
+export type ItineraryData = z.infer<typeof ItineraryDataSchema>;
+
 export async function POST(request: NextRequest) {
   try {
-    const { destino, dias, moeda, preferencias } = await request.json();
+    const { destination, days, preferences } = await request.json();
 
     if (!GROQ_API_KEY) {
       return NextResponse.json(
@@ -14,7 +32,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `Crie um roteiro COMPLETO e MUITO DETALHADO para ${dias} dias em ${destino}.
+    if (!destination || !days) {
+      return NextResponse.json({ error: "Missing params" }, { status: 400 });
+    }
+
+    const prompt = `
+Crie um roteiro COMPLETO e MUITO DETALHADO para ${days} dias em ${destination}.
 
 REGRAS IMPORTANTES:
 - Use MUITOS EMOJIS relevantes
@@ -22,13 +45,32 @@ REGRAS IMPORTANTES:
   • Horários específicos (ex: 08:00, 12:30, 15:00)
   • Pelo menos 5-7 atividades por dia
   • Explicação de transporte entre pontos
-  • Custos aproximados em ${moeda}
+  • Restaurantes e lugares para se alimentar
+  • Custos aproximados em real brasileiro, inclua o preço em dólar americano entre parênteses
   • Dicas práticas
-- Estruture com títulos claros: "Dia 1: [Tema]"
-- Inclua restaurantes recomendados
 - Idioma: Português do Brasil
 - Tom: Amigável e inspirador
-${preferencias ? `\nPreferências: ${preferencias}` : ""}`;
+${preferences ? `\n- Preferências do turista: ${preferences}` : ""}
+- Estruture sua resposta em JSON seguindo o formato: 
+{
+  "destination": string,
+  "days": number,
+  "daysList": [
+    {
+      "day": 1,
+      "title": "Dia 1 — ...",
+      "description": "Markdown text describing the itinerary for this day",
+      "tips": ["tip1", "tip2"]
+    },
+    ...
+  ]
+}
+- Na "description" de cada dia, destaques devem ser palavras em negrito. Avisos importantes devem ser palavras em itálico.
+- Seja cuidadoso na formatação de "title" e "description".
+- "destination" deve incluir ambos estado e país se ${destination} não os inclui.
+
+Return valid JSON only. Do not include any commentary or code fences.
+`;
 
     const response = await fetch(GROQ_ENDPOINT, {
       method: "POST",
@@ -41,7 +83,7 @@ ${preferencias ? `\nPreferências: ${preferencias}` : ""}`;
         messages: [
           {
             role: "system",
-            content: `Você é um especialista em turismo. Crie roteiros detalhados usando ${moeda} para valores.`,
+            content: `Você é um especialista em turismo. Crie roteiros detalhados usando real brasileiro para valores.`,
           },
           {
             role: "user",
@@ -58,16 +100,25 @@ ${preferencias ? `\nPreferências: ${preferencias}` : ""}`;
       throw new Error(error.error?.message || "Erro na API Groq");
     }
 
-    const data = await response.json();
-    const texto = data.choices?.[0]?.message?.content;
+    const groqData = await response.json();
+    const groqChoices = JSON.parse(groqData.choices?.[0]?.message?.content);
+    const itineraryData: ItineraryData = {
+      id: groqData.id,
+      createdAt: groqData.created,
+      ...groqChoices,
+    };
+    const parsed = ItineraryDataSchema.safeParse(itineraryData);
 
-    if (!texto) {
-      throw new Error("Resposta vazia da IA");
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Failed to generate itinerary" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ texto });
+    return NextResponse.json(parsed.data);
   } catch (error) {
-    console.error("Error:", error)
+    console.error("Error:", error);
     return NextResponse.json(
       {
         erro: error instanceof Error ? error.message : "Erro ao gerar roteiro",

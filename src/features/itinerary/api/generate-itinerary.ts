@@ -1,35 +1,28 @@
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
+
 export interface GenerateItineraryParams {
-  destino: string;
-  dias: number;
-  moeda: string;
-  estilo: string;
+  destination: string;
+  days: number;
+  preferences: string;
 }
 
-export interface GenerateItineraryResponse {
-  texto: string;
-}
+// TODO Place underlying hook in this file
 
-export async function generateItinerary({
-  destino,
-  dias,
-  moeda,
-  estilo,
-}: GenerateItineraryParams): Promise<GenerateItineraryResponse> {
+export async function generateItinerary(
+  params: GenerateItineraryParams
+): Promise<ItineraryData> {
   const response = await fetch("/api/generate-itinerary", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ destino, dias, moeda, estilo }),
+    body: JSON.stringify(params),
   });
 
   if (!response.ok) {
-    throw new Error("Erro ao gerar roteiro");
+    const json = await response.json().catch(() => ({}));
+    throw new Error(json?.error || "Erro ao gerar roteiro");
   }
 
   const json = await response.json();
-
-  if (!json || typeof json.texto !== "string") {
-    throw new Error("Resposta inválida ao gerar roteiro");
-  }
 
   return json;
 }
