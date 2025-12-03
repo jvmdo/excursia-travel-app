@@ -8,6 +8,7 @@ import {
 import { ChatMessageList } from "@/features/chat/components/chat-message-list";
 import { ChatInput } from "@/features/chat/components/chat-input";
 import { ChatMessage } from "@/features/chat/api/send-chat-message";
+import { ChatTooltip } from "@/features/chat/components/chat-tooltip";
 
 interface ChatWidgetProps {
   input: string;
@@ -26,9 +27,11 @@ export function ChatWidget({
 }: ChatWidgetProps) {
   return (
     <Popover>
-      <PopoverTrigger className="fixed z-10 bottom-6 right-6 w-16 h-16 rounded-full shadow-xl bg-linear-to-r from-sky-500 to-cyan-400 hover:scale-110 text-white text-2xl cursor-pointer">
-        💬
-      </PopoverTrigger>
+      <ChatTooltip>
+        <PopoverTrigger className="fixed z-10 bottom-6 right-6 w-16 h-16 rounded-full shadow-xl bg-linear-to-r from-sky-500 to-cyan-400 hover:scale-110 text-white text-2xl">
+          💬
+        </PopoverTrigger>
+      </ChatTooltip>
 
       <PopoverContent className="w-96 p-0 shadow-xl" align="end">
         <div className="bg-linear-to-r from-sky-500 to-cyan-400 text-white p-4 rounded-t-lg">
