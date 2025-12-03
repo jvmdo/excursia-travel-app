@@ -17,7 +17,8 @@
   - Dollar to Real
 
 - Form
-  - Placeholder
+  - Change "Dias de viagem" para "Quantos dias de viagem?"
+  - Preferences placeholder
 
 - Toast
   - Fix: itinerary glitches when toast dismiss
@@ -27,10 +28,7 @@
   - When is the proper moment to show it? At PDF download
 
 - Chat
-  - Fix: typing causes itinerary to full re-render
-  - Fix: button is hidden behind
-  - Non-stop bouncing
-  - Answer formatting
+  - Answer formatting: what is a good chat formatting?
 
 - PDF
   - First page is empty (only title is written down)
@@ -47,3 +45,19 @@
   - excursia-travel.vercel.app
   - excursia-roteiros-de-viagem.vercel.app
   - excursia-itinerary-maker.vercel.app
+
+### Gepeto
+
+- Bugs
+  - PDF output is not pretty formatted as is was before refactor
+  - Toast validation in form not showing at all. Replace Toaster by shadcn Sonner and fix the problems.
+
+- Improve
+  - Loading while generating itinerary: it should display a beautiful gradient loading bar placeholder as before;
+
+- Propose DX and UX improvement using react and next latest features
+  - server actions?
+  - query?
+  - shad forms
+
+write down bugs, use this already implemented: ...,

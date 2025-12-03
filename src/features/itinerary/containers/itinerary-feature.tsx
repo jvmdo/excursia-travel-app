@@ -5,10 +5,15 @@ import { ItineraryForm } from "@/features/itinerary/components/itinerary-form";
 import { ItineraryResult } from "@/features/itinerary/components/itinerary-result";
 import { SavedItineraryList } from "@/features/itinerary/components/saved-itinerary-list";
 import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
-import { useSavedItineraries } from "@/features/itinerary/hooks/use-saved-itineraries";
+import {
+  Itinerary,
+  useSavedItineraries,
+} from "@/features/itinerary/hooks/use-saved-itineraries";
+import { useState } from "react";
 
 export function ItineraryFeature() {
   const toast = useToast();
+  const [loadHtml, setLoadHtml] = useState<string | null>(null);
 
   const { isLoading, resultHtml, currentDestination, generate } =
     useGenerateItinerary();
@@ -23,7 +28,9 @@ export function ItineraryFeature() {
     try {
       const html = await generate(values);
 
+      setLoadHtml(null);
       add({
+        id: crypto.randomUUID(),
         destination: values.destination,
         days: values.days,
         html,
@@ -61,9 +68,14 @@ export function ItineraryFeature() {
     newWindow.print();
   };
 
-  const handleLoad = (index: number) => {
-    const item = load(index);
-    if (!item) return;
+  const handleLoad = (id: string) => {
+    const item = load(id);
+
+    if (!item) {
+      return;
+    }
+
+    setLoadHtml(item.html);
 
     toast.toast({
       title: "📂 Roteiro carregado",
@@ -76,18 +88,13 @@ export function ItineraryFeature() {
       <ItineraryForm onSubmit={handleSubmit} isLoading={isLoading} />
 
       <ItineraryResult
-        html={resultHtml}
+        html={loadHtml ?? resultHtml}
         destination={currentDestination}
         onGeneratePDF={handleGeneratePDF}
       />
 
       <SavedItineraryList
-        itineraries={saved.map((s) => ({
-          destination: s.destination,
-          days: s.days,
-          html: s.html,
-          date: s.date,
-        }))}
+        itineraries={saved}
         onLoad={handleLoad}
         onDelete={remove}
       />
