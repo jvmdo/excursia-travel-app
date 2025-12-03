@@ -5,7 +5,7 @@ import React from "react";
 import { PWAInstallButton } from "@/components/pwa-install-button";
 import { Toaster } from "@/components/ui/toaster";
 import { ItineraryFeature } from "@/features/itinerary/containers/itinerary-feature";
-import { ChatFeature } from "@/features/chat/containers/chat-feature";
+import ChatWidgetContainer from "@/features/chat/chat-widget-container";
 import { AuthFeature } from "@/features/auth/containers/auth-feature";
 
 function TravelAppContainer() {
@@ -29,7 +29,7 @@ function TravelAppContainer() {
         <ItineraryFeature />
       </main>
 
-      <ChatFeature />
+      <ChatWidgetContainer />
       <Toaster />
       {/* <PWAInstallButton /> */}
     </div>

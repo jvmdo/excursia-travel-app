@@ -5,31 +5,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ChatFabButton } from "@/features/chat/components/chat-fab-button";
 import { ChatMessageList } from "@/features/chat/components/chat-message-list";
 import { ChatInput } from "@/features/chat/components/chat-input";
+import { ChatMessage } from "@/features/chat/api/send-chat-message";
+
+interface ChatWidgetProps {
+  input: string;
+  isLoading: boolean;
+  messages: ChatMessage[];
+  onInputChange: (value: string) => void;
+  onSend: () => void;
+}
 
 export function ChatWidget({
-  open,
-  onOpenChange,
   messages,
   isLoading,
   input,
   onInputChange,
   onSend,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  messages: { role: "user" | "assistant"; content: string }[];
-  isLoading: boolean;
-  input: string;
-  onInputChange: (value: string) => void;
-  onSend: () => void;
-}) {
+}: ChatWidgetProps) {
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-        <ChatFabButton onClick={() => onOpenChange(!open)} />
+    <Popover>
+      <PopoverTrigger className="fixed z-10 bottom-6 right-6 w-16 h-16 rounded-full shadow-xl bg-linear-to-r from-sky-500 to-cyan-400 hover:scale-110 text-white text-2xl cursor-pointer">
+        💬
       </PopoverTrigger>
 
       <PopoverContent className="w-96 p-0 shadow-xl" align="end">
