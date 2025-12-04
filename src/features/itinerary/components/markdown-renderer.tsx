@@ -5,7 +5,27 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 
+function parseItinerary(text: string) {
+  if (typeof text !== "string") throw new TypeError("text must be a string");
+
+  // Find each block that starts with [HH:MM] up to the next [HH:MM] or end.
+  const blocks =
+    text.match(/\[\d{2}:\d{2}\][\s\S]*?(?=(\[\d{2}:\d{2}\])|$)/g) || [];
+
+  const cleaned = blocks.map((raw) => {
+    let s = raw.trim();
+
+    // Normalize multiple spaces
+    s = s.replace(/\s{2,}/g, " ");
+
+    return `- ${s}`;
+  });
+
+  return cleaned.join("\n");
+}
+
 export function MarkdownRenderer({ markdown }: { markdown: string }) {
+  const aff = parseItinerary(markdown);
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -39,7 +59,7 @@ export function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
 
         strong: ({ children }) => (
-          <strong className="font-semibold text-slate-900">{children}</strong>
+          <strong className="font-semibold text-[#0EA5E9]">{children}</strong>
         ),
 
         em: ({ children }) => (
@@ -47,7 +67,7 @@ export function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
 
         ul: ({ children }) => (
-          <ul className="list-disc pl-6 space-y-2 mb-3">{children}</ul>
+          <ul className="list-disc pl-6 space-y-2 mb-3">{children} </ul>
         ),
 
         ol: ({ children }) => (
@@ -55,7 +75,7 @@ export function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
 
         li: ({ children }) => (
-          <li className="text-[15px] leading-relaxed text-slate-700">
+          <li className="hover:translate-x-1 transition-all pr-1 text-base leading-relaxed text-slate-700 marker:text-purple-500">
             {children}
           </li>
         ),
@@ -90,7 +110,7 @@ export function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
       }}
     >
-      {markdown}
+      {aff}
     </ReactMarkdown>
   );
 }

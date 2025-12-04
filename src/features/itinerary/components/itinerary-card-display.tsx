@@ -54,10 +54,7 @@ export function ItineraryCardDisplay({
 
   return (
     <>
-      <Card
-        className="mb-6 shadow-lg cursor-pointer transition-all hover:shadow-xl hover:scale-[1.01] duration-300"
-        onClick={handleCardClick}
-      >
+      <Card className="mb-6" onClick={handleCardClick}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <span className="animate-pulse">✨</span> Seu Roteiro
@@ -69,16 +66,49 @@ export function ItineraryCardDisplay({
             }}
             size="sm"
             variant="outline"
-            className="transition-all hover:scale-105"
+            className="transition-all hover:scale-105 cursor-pointer"
           >
             📄 Baixar PDF
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            {itinerary.daysList.map((day) => (
-              <MarkdownRenderer key={day.day} markdown={day.description} />
-            ))}
+          <div className="py-2">
+            <div className="itinerary-header mb-4">
+              <h2 className="destination-title text-2xl font-bold">
+                📍 {itinerary.destination}
+              </h2>
+              <p className="itinerary-meta text-sm text-muted-foreground">
+                {itinerary.days} dias • Gerado em{" "}
+                {itinerary.createdAt &&
+                  new Date(itinerary.createdAt * 1000).toLocaleDateString(
+                    "pt-BR"
+                  )}{" "}
+                • Valores em R$
+              </p>
+            </div>
+            <div className="relative pl-6 mt-6">
+              {/* Vertical timeline */}
+              <div className="absolute left-0 -top-8 -bottom-4 w-1 bg-linear-to-b from-sky-500 via-cyan-400 to-purple-400 rounded-full" />
+
+              <div className="space-y-10">
+                {itinerary.daysList.map((day) => (
+                  <div key={day.day} className="relative">
+                    <div className="absolute -left-9 top-3 w-7 h-7 rounded-full bg-linear-to-r from-sky-500 to-cyan-400 shadow-md flex items-center justify-center text-sm font-bold text-white">
+                      {day.day}
+                    </div>
+
+                    <div className="p-2 outline outline-purple-200 rounded-xl shadow-sm hover:shadow-md hover:outline-2 transition-all duration-300 bg-linear-to-br from-sky-50/70 toblue--50/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="px-2 pt-2 text-lg font-semibold text-slate-900">
+                          {day.title}
+                        </h3>
+                      </div>
+                      <MarkdownRenderer markdown={day.description} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

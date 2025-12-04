@@ -11,7 +11,7 @@ import { AuthFeature } from "@/features/auth/containers/auth-feature";
 function TravelAppContainer() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-orange-50">
-      <header className="bg-linear-to-r from-sky-500 via-cyan-400 to-orange-400 text-white py-8 px-4 text-center relative">
+      <header className="bg-linear-to-r from-sky-500 via-cyan-400 to-purple-400 text-white py-8 px-4 text-center relative">
         <div className="absolute top-4 right-4">
           <AuthFeature />
         </div>

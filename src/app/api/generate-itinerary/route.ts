@@ -46,7 +46,7 @@ REGRAS IMPORTANTES:
   • Pelo menos 5-7 atividades por dia
   • Explicação de transporte entre pontos
   • Restaurantes e lugares para se alimentar
-  • Custos aproximados em real brasileiro, inclua o preço em dólar americano entre parênteses
+  • Custos aproximados em real brasileiro, inclua o preço em dólar americano entre parênteses somente se o destino for fora do Brasil.
   • Dicas práticas
 - Idioma: Português do Brasil
 - Tom: Amigável e inspirador
@@ -58,16 +58,16 @@ ${preferences ? `\n- Preferências do turista: ${preferences}` : ""}
   "daysList": [
     {
       "day": 1,
-      "title": "Dia 1 — ...",
-      "description": "Markdown text describing the itinerary for this day",
+      "title": "Título",
+      "description": "Texto descrevendo o itinerário desse dia. Inicie cada atividade com as horas entre colchetes. Não inclua tips nesse texto.",
       "tips": ["tip1", "tip2"]
     },
     ...
   ]
 }
 - Na "description" de cada dia, destaques devem ser palavras em negrito. Avisos importantes devem ser palavras em itálico.
-- Seja cuidadoso na formatação de "title" e "description".
-- "destination" deve incluir ambos estado e país se ${destination} não os inclui.
+- "destination" deve incluir ambos estado (abreviado em sigla) e país se ${destination} não os inclui.
+
 
 Return valid JSON only. Do not include any commentary or code fences.
 `;
@@ -101,6 +101,7 @@ Return valid JSON only. Do not include any commentary or code fences.
     }
 
     const groqData = await response.json();
+    console.log(groqData.choices?.[0]?.message?.content);
     const groqChoices = JSON.parse(groqData.choices?.[0]?.message?.content);
     const itineraryData: ItineraryData = {
       id: groqData.id,
@@ -108,6 +109,7 @@ Return valid JSON only. Do not include any commentary or code fences.
       ...groqChoices,
     };
     const parsed = ItineraryDataSchema.safeParse(itineraryData);
+    console.log(parsed.error?.issues);
 
     if (!parsed.success) {
       return NextResponse.json(
