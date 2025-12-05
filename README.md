@@ -3,37 +3,31 @@
 ## TODO
 
 - Checklist
-  - Where is the trigger? How to reopen after closing it?
+  - Where is the trigger?
     - Left of the download button
     - At the end of the itinerary
   - Warn about items not checked
   - Message if all items are checked
   - Fix: Transparent background when opening
-  - Feat: local storage
+  - Feat: local storage with its itinerary
   - Feat: adapt according to travel type
   - Feat: database
 
-- Itinerary
-  - Dollar to Real
-  - Remove cursor pointer
-  - Remove leading asterisk, make time bold
+- PDF
+  - Include checklist
 
 - Itinerary list
-  - Feat: local storage
   - Feat: database
 
 - Toast
-  - Fix: itinerary glitches when toast dismiss
-  - Fix: lack of content for invalid form submit
+  - Replace this shit by something good
 
 - Thanks modal
   - When is the proper moment to show it? At PDF download
 
 - Chat
   - Answer formatting: what is a good chat formatting?
-
-- PDF
-  - First page is empty (only title is written down)
+  - Use a proper model for chatting. Configure for small payload.
 
 - Form
   - Loading while generating itinerary: it should display a beautiful gradient loading bar placeholder with animation that seems something impressive is cooking;
@@ -53,16 +47,3 @@
 
 - Groq
   - Quantos tokens disponíveis?
-
-### Gepeto
-
-- Bugs
-  - PDF output is not pretty formatted as is was before refactor
-  - Toast validation in form not showing at all. Replace Toaster by shadcn Sonner and fix the problems.
-
-- Propose DX and UX improvement using react and next latest features
-  - server actions?
-  - query?
-  - shad forms
-
-write down bugs, use this already implemented: ...,

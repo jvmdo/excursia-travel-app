@@ -60,14 +60,14 @@ export function buildPdfHtml(itinerary: ItineraryData) {
   body.push(`<div class="itinerary-header">`);
   body.push(`<h2 class="destination-title">📍 ${itinerary.destination}</h2>`);
   body.push(
-    `<p class="itinerary-meta">${itinerary.days} dias ${
+    `<p class="itinerary-meta">${itinerary.numberOfDays} dias ${
       itinerary.createdAt &&
       `• Gerado em ${new Date(itinerary.createdAt).toLocaleDateString("pt-BR")}`
     } • Valores em R$</p>`
   );
   body.push(`</div>`);
 
-  itinerary.daysList.forEach((d) => {
+  itinerary.dayItineraries.forEach((d) => {
     body.push(`<div class="day-card-modern">`);
     body.push(
       `<div class="day-title"><h3>📅 Dia ${d.day} — ${d.title}</h3></div>`

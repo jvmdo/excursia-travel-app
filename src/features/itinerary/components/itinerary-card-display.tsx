@@ -23,7 +23,7 @@ export function ItineraryCardDisplay({
             <span className="animate-pulse">✨</span> Seu Roteiro
           </CardTitle>
           <div className="flex gap-4 justify-self-center">
-            <ChecklistDialog />
+            <ChecklistDialog docs={itinerary.neededDocuments} />
             <ThankYouDialog>
               <button
                 className="transition-all hover:scale-105 cursor-pointer w-28"
@@ -47,7 +47,7 @@ export function ItineraryCardDisplay({
                 📍 {itinerary.destination}
               </h2>
               <p className="itinerary-meta text-sm text-muted-foreground">
-                {itinerary.days} dias • Gerado em{" "}
+                {itinerary.numberOfDays} dias • Gerado em{" "}
                 {itinerary.createdAt &&
                   new Date(itinerary.createdAt * 1000).toLocaleDateString(
                     "pt-BR"
@@ -60,7 +60,7 @@ export function ItineraryCardDisplay({
               <div className="absolute left-0 -top-8 -bottom-4 w-1 bg-linear-to-b from-sky-500 via-cyan-400 to-purple-400 rounded-full" />
 
               <div className="space-y-10">
-                {itinerary.daysList.map((day) => (
+                {itinerary.dayItineraries.map((day) => (
                   <div key={day.day} className="relative">
                     <div className="absolute -left-9 top-3 w-7 h-7 rounded-full bg-linear-to-r from-sky-500 to-cyan-400 shadow-md flex items-center justify-center text-sm font-bold text-white">
                       {day.day}
