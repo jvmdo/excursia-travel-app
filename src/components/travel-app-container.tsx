@@ -1,13 +1,11 @@
 "use client";
 
-import React from "react";
-
-import { PWAInstallButton } from "@/components/pwa-install-button";
 import { Toaster } from "@/components/ui/toaster";
-import { ItineraryFeature } from "@/features/itinerary/containers/itinerary-feature";
-import ChatWidgetContainer from "@/features/chat/chat-widget-container";
+import { ItineraryContainer } from "@/features/itinerary/itinerary-container";
 import { AuthFeature } from "@/features/auth/containers/auth-feature";
+import ChatWidgetContainer from "@/features/chat/chat-widget-container";
 
+// TODO: Move whole JSX to page
 function TravelAppContainer() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-orange-50">
@@ -26,7 +24,7 @@ function TravelAppContainer() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 -mt-4 relative z-10">
-        <ItineraryFeature />
+        <ItineraryContainer />
       </main>
 
       <ChatWidgetContainer />

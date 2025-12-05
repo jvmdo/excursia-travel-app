@@ -10,7 +10,7 @@ import { useState } from "react";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { buildPdfHtml } from "@/features/itinerary/utils/build-pdf-html";
 
-export function ItineraryFeature() {
+export function ItineraryContainer() {
   const toast = useToast();
   const [itinerary, setItinerary] = useState<ItineraryData>();
 
