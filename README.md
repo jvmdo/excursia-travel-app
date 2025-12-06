@@ -2,37 +2,28 @@
 
 ## TODO
 
-- Checklist
-  - Where is the trigger?
-    - Left of the download button
-    - At the end of the itinerary
-  - Warn about items not checked
-  - Message if all items are checked
-  - Fix: Transparent background when opening
-  - Feat: local storage with its itinerary
-  - Feat: adapt according to travel type
-  - Feat: database
-
 - PDF
-  - Include checklist
-
-- Itinerary list
-  - Feat: database
-
-- Toast
-  - Replace this shit by something good
-
-- Thanks modal
-  - When is the proper moment to show it? At PDF download
-
+  - Fix formatting
+  
 - Chat
   - Answer formatting: what is a good chat formatting?
   - Use a proper model for chatting. Configure for small payload.
 
+- Toast
+  - Replace this shit by something better
+  
 - Form
   - Loading while generating itinerary: it should display a beautiful gradient loading bar placeholder with animation that seems something impressive is cooking;
+  - Button: shadow on hover
+  
+- Itinerary list
+  - Feat: database
 
 - OnProfit Webhook API
+
+- Tabs
+  - Gerar roteiro
+  - Meus roteiros
 
 - PWA
   - Install button
@@ -44,6 +35,3 @@
   - excursia-travel.vercel.app
   - excursia-roteiros-de-viagem.vercel.app
   - excursia-itinerary-maker.vercel.app
-
-- Groq
-  - Quantos tokens disponíveis?

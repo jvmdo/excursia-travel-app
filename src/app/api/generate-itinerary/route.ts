@@ -12,17 +12,11 @@ const ItineraryDaySchema = z.object({
   tips: z.array(z.string()).optional(),
 });
 
-const ItineraryDocsSchema = z.object({
-  label: z.string(),
-  emoji: z.string(),
-});
-
 export const ItineraryDataSchema = z.object({
   id: z.string(),
   destination: z.string(),
   numberOfDays: z.number(),
   dayItineraries: z.array(ItineraryDaySchema),
-  neededDocuments: z.array(ItineraryDocsSchema).optional(),
   createdAt: z.number().optional(),
 });
 

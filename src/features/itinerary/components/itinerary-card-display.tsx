@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MarkdownRenderer } from "@/features/itinerary/components/markdown-renderer";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import ThankYouDialog from "@/features/itinerary/components/thank-you-dialog";
-import { ChecklistDialog } from "@/components/checklist-dialog";
 
 interface ItineraryCardDisplayProps {
   itinerary: ItineraryData;
@@ -23,7 +22,6 @@ export function ItineraryCardDisplay({
             <span className="animate-pulse">✨</span> Seu Roteiro
           </CardTitle>
           <div className="flex gap-4 justify-self-center">
-            <ChecklistDialog docs={itinerary.neededDocuments} />
             <ThankYouDialog>
               <button
                 className="transition-all hover:scale-105 cursor-pointer w-28"
