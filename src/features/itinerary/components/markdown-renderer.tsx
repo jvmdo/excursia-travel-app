@@ -54,11 +54,11 @@ export function MarkdownRenderer({ markdown }: { markdown: string }) {
         ),
 
         ol: ({ children }) => (
-          <ol className="list-decimal pl-6 space-y-2 mb-3">{children}</ol>
+          <ol className="list-decimal pl-6 space-y-2 py-1">{children}</ol>
         ),
 
         li: ({ children }) => (
-          <li className="hover:translate-x-1 transition-all pr-1 text-base leading-relaxed text-slate-700 marker:text-purple-500">
+          <li className="hover:translate-x-1 transition-all pr-1 text-base leading-relaxed text-slate-700 marker:text-purple-500 in-[ol]:text-sm in-[ol]:mb-0">
             {children}
           </li>
         ),

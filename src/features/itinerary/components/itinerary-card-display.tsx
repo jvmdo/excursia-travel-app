@@ -64,16 +64,31 @@ export function ItineraryCardDisplay({
                       {day.day}
                     </div>
 
-                    <div className="p-2 outline outline-purple-200 rounded-xl shadow-sm hover:shadow-md hover:outline-2 transition-all duration-300 bg-linear-to-br from-sky-50/70 to-white">
+                    <div className="p-2 outline outline-purple-200 rounded-xl shadow-sm hover:shadow-md hover:outline-2 transition-all duration-100 bg-linear-to-br from-sky-50/70 to-white">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="px-2 pt-2 text-lg font-semibold text-slate-900">
                           {day.title}
                         </h3>
                       </div>
-                      {day.activities.map((activity) => (
-                        <MarkdownRenderer markdown={`- ${activity}`} />
-                      ))}
+                      <MarkdownRenderer
+                        markdown={day.activities
+                          .map((a) => `- ${a}`)
+                          .join("\n")}
+                      />
                     </div>
+
+                    {day.tips && day.tips.length > 0 && (
+                      <div className="mt-2 px-2 py-1 outline outline-gray-300 rounded-xl bg-linear-to-br from-gray-100/50 to-white">
+                        <h4 className="px-2 pt-1 text-base font-semibold text-slate-700">
+                          Dicas
+                        </h4>
+                        <MarkdownRenderer
+                          markdown={day.tips
+                            .map((tip, index) => `${index + 1}. ${tip}`)
+                            .join("\n")}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
