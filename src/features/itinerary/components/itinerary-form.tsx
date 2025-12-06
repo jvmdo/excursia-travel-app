@@ -23,10 +23,8 @@ export function ItineraryForm({
   const [days, setDays] = useState("");
   const [preferences, setPreferences] = useState("");
 
-  const handleAppendTemplate = (text: string) => {
-    setPreferences((prev) =>
-      prev.trim().length === 0 ? text : prev + "\n" + text
-    );
+  const handleInsertTemplate = (text: string) => {
+    setPreferences(text);
   };
 
   const handleSubmit = () => {
@@ -74,16 +72,16 @@ export function ItineraryForm({
           placeholder="Escreva suas preferências ou selecione dentre as pré-definidas abaixo"
           value={preferences}
           onChange={(e) => setPreferences(e.target.value)}
-          maxLength={100}
+          maxLength={60}
           className="pl-10 min-h-24 text-sm"
         />
 
         <div className="text-xs text-muted-foreground text-right mt-1">
-          {preferences.length}/100
+          {preferences.length}/60
         </div>
       </div>
 
-      <TemplateSelector onSelect={handleAppendTemplate} />
+      <TemplateSelector onSelect={handleInsertTemplate} />
 
       <Button
         disabled={isLoading}
