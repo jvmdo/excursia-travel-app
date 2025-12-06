@@ -19,7 +19,9 @@ export async function generateItinerary(
 
   if (!response.ok) {
     const json = await response.json().catch(() => ({}));
-    throw new Error(json?.error || "Erro ao gerar roteiro");
+    throw new Error(
+      json?.error || "Algo inesperado aconteceu. Tente novamente mais tarde"
+    );
   }
 
   const json = await response.json();

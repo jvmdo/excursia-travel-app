@@ -19,28 +19,24 @@ export function ItineraryContainer() {
   const { saved, add, remove, load } = useSavedItineraries();
 
   const handleSubmit = async (values: {
-    destination: string;
     days: number;
+    destination: string;
     preferences: string;
   }) => {
     try {
       const newItinerary = await generate(values);
-
-      if (!newItinerary) {
-        throw new Error();
-      }
 
       setItinerary(newItinerary);
       add(newItinerary);
 
       toast.toast({
         title: "✨ Roteiro gerado!",
-        description: `Seu itinerário para ${values.destination} foi criado com sucesso.`,
+        description: `Seu itinerário para ${newItinerary.destination} foi criado com sucesso.`,
       });
-    } catch {
+    } catch (err) {
       toast.toast({
         title: "❌ Erro ao gerar roteiro",
-        description: "Tente novamente mais tarde.",
+        description: err as string,
         variant: "destructive",
       });
     }

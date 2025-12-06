@@ -72,7 +72,9 @@ export function ItineraryCardDisplay({
                           {day.title}
                         </h3>
                       </div>
-                      <MarkdownRenderer markdown={day.description} />
+                      {day.activities.map((activity) => (
+                        <MarkdownRenderer markdown={`- ${activity}`} />
+                      ))}
                     </div>
                   </div>
                 ))}

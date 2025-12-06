@@ -8,7 +8,7 @@ import pRetry from "p-retry";
 const ItineraryDaySchema = z.object({
   day: z.number(),
   title: z.string(),
-  description: z.string(), // markdown
+  activities: z.array(z.string()),
   tips: z.array(z.string()).optional(),
 });
 
@@ -46,9 +46,11 @@ export async function POST(request: NextRequest) {
       async () => await getGroqChatCompletion(prompt),
       {
         retries: 3,
+        factor: 5,
         shouldRetry({ error }) {
-          if (error instanceof Groq.APIError && error.status === 400) {
-            return true;
+          if (error instanceof Groq.APIError) {
+            const code = error.status as number;
+            return shouldRetryStatus[code] ?? false;
           }
           return false;
         },
@@ -84,7 +86,7 @@ export async function POST(request: NextRequest) {
         Se o error persistir, tente alterar suas preferências.`;
     }
 
-    return NextResponse.json({ erro: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -107,13 +109,12 @@ async function getGroqChatCompletion(prompt: string) {
                   - Dicas práticas
               - Se o destino não for específico o suficiente, escolha o destino correspondente mais famoso.
               - Destino retornado deve incluir ambos estado (abreviado em sigla) e país se o usuário não os incluiu na requisição.
-              - Se o destino for fora do Brasil, inclua o campo 'docs' no JSON de resposta com documentos necessários para entrar no país. Por exemplo, mas não se abstendo apenas a esses, visto americano e comprovante de vacinas (detalhas quais vacinas).
 
             Regras de formatação do itinerário:
               - Comece cada atividade com o horário em colchetes. Por exemplo, "[8:45] Descobrindo a cidade..."
+              - Escreva um parágrafo para cada atividade. Cada parágrafo deve ser um item no array "activities" do schema fornecido.
               - Destaque palavras de interesse em negrito. Por exemplo, "**Cristo Redentor**"
               - Destaque palavras de aviso/atenção em itálico. Por exemplo, "_Negocie preços_"
-              - Escreva tudo em um só parágrafo.
               - O título não deve conter o número do dia. Por exemplo, "Dia 1: Explorando..." não é válido. O correto é "Explorando...".
               - Inclua emojis no título e no conteúdo.
               - Não inclua as dicas no conteúdo, elas são exclusivas do campo "tips" do schema fornecido.
@@ -145,3 +146,10 @@ async function getGroqChatCompletion(prompt: string) {
     },
   });
 }
+
+const shouldRetryStatus: Record<number, boolean> = {
+  400: true,
+  500: true,
+  502: true,
+  503: false, // Try again later
+};

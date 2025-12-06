@@ -73,8 +73,8 @@ export function buildPdfHtml(itinerary: ItineraryData) {
       `<div class="day-title"><h3>📅 Dia ${d.day} — ${d.title}</h3></div>`
     );
     body.push(
-      `<div class="day-content-enhanced">${renderMarkdownToHtml(
-        parseItinerary(d.description)
+      `<div class="day-content-enhanced">${d.activities.map((activity) =>
+        renderMarkdownToHtml(parseItinerary(activity))
       )}</div>`
     );
 

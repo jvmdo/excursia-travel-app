@@ -5,6 +5,7 @@ import {
   GenerateItineraryParams,
 } from "@/features/itinerary/api/generate-itinerary";
 
+// TODO: useItinerary that returns either itinerary or error?
 export function useGenerateItinerary() {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,7 +16,7 @@ export function useGenerateItinerary() {
       try {
         return await generateItinerary(itineraryDetails);
       } catch (e) {
-        console.error((e as Error).message);
+        throw (e as Error).message;
       } finally {
         setIsLoading(false);
       }

@@ -3,6 +3,7 @@
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { ItineraryCardDisplay } from "@/features/itinerary/components/itinerary-card-display";
 
+// TODO: Get rid of this useless shit
 export function ItineraryResult({
   itinerary,
   onGeneratePDF,
