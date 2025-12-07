@@ -2,9 +2,6 @@
 
 ## TODO
 
-- PDF
-  - Fix formatting
-  
 - Chat
   - Answer formatting: what is a good chat formatting?
   - Use a proper model for chatting. Configure for small payload.
@@ -17,6 +14,7 @@
   - Button: shadow on hover
   
 - Itinerary list
+  - Fix: card date
   - Feat: database
 
 - OnProfit Webhook API

@@ -2,13 +2,12 @@
 
 import { useToast } from "@/hooks/use-toast";
 import { ItineraryForm } from "@/features/itinerary/components/itinerary-form";
-import { ItineraryResult } from "@/features/itinerary/components/itinerary-result";
 import { SavedItineraryList } from "@/features/itinerary/components/saved-itinerary-list";
 import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
 import { useSavedItineraries } from "@/features/itinerary/hooks/use-saved-itineraries";
 import { useState } from "react";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
-import { buildPdfHtml } from "@/features/itinerary/utils/build-pdf-html";
+import { ItinerarySection } from "@/features/itinerary/components/itinerary-section";
 
 export function ItineraryContainer() {
   const toast = useToast();
@@ -42,16 +41,6 @@ export function ItineraryContainer() {
     }
   };
 
-  const handleGeneratePDF = () => {
-    const newWindow = window.open("", "", "width=800,height=600");
-    if (!newWindow || !itinerary) return;
-
-    const pdfContent = buildPdfHtml(itinerary);
-    newWindow.document.write(pdfContent);
-    newWindow.document.close();
-    newWindow.print();
-  };
-
   const handleLoad = (id: string) => {
     const itinerary = load(id);
 
@@ -76,12 +65,7 @@ export function ItineraryContainer() {
     <div className="space-y-8 mt-6">
       <ItineraryForm onSubmit={handleSubmit} isLoading={isLoading} />
 
-      {itinerary && (
-        <ItineraryResult
-          itinerary={itinerary}
-          onGeneratePDF={handleGeneratePDF}
-        />
-      )}
+      {itinerary && <ItinerarySection itinerary={itinerary} />}
 
       <SavedItineraryList
         itineraries={saved}

@@ -17,7 +17,7 @@ export const ItineraryDataSchema = z.object({
   destination: z.string(),
   numberOfDays: z.number(),
   dayItineraries: z.array(ItineraryDaySchema),
-  createdAt: z.number().optional(),
+  createdAt: z.number(),
 });
 
 export type ItineraryData = z.infer<typeof ItineraryDataSchema>;
@@ -112,7 +112,7 @@ async function getGroqChatCompletion(prompt: string) {
               - O título não deve conter o número do dia. Por exemplo, "Dia 1: Explorando..." não é válido. O correto é "Explorando...".
               - Inclua emojis no título e no conteúdo.
               - Não inclua as dicas no conteúdo, elas são exclusivas do campo "tips" do schema fornecido.
-              - Não repita dicas no campo "tips". Se não houver dicas diferentes para cada dia, inclua-as somente no último dia.
+              - Não inclua dicas duplicadas. Se não houver dicas diferentes para cada dia, inclua-as somente no último dia.
 
             Seja amigável e inspirador.
             Responda em Português do Brasil.
