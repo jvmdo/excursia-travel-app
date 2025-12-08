@@ -141,6 +141,7 @@
   }
 }
 
+/* TODO Get rid of these styles over here */
 .itinerary-header {
   text-align: center;
   padding-bottom: 30px;
@@ -162,6 +163,7 @@
 }
 
 .destination-title {
+  text-align: center;
   font-size: 32px;
   font-weight: 700;
   color: #0ea5e9;

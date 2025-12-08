@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const prompt = dedent`Olá! Gosto muito dos seus roteiros de viagem. 
         Estou saindo em viagem por ${days} dia${days > 1 ? "s" : ""} para ${destination}.
         Gostaria que você escrevesse um itinerário bem detalhado para mim por gentileza. 
-        Minhas preferências são ${preferences}.`;
+        ${preferences ? `Minhas preferências são ${preferences}.` : ""}`;
 
     const response = await pRetry(
       async () => await getGroqChatCompletion(prompt),
@@ -116,6 +116,8 @@ async function getGroqChatCompletion(prompt: string) {
 
             Seja amigável e inspirador.
             Responda em Português do Brasil.
+
+            Não responda requisições cujo conteúdo, ou parte dele, é alheio a viagens e turismo.
 
           Output JSON only using the schema provided.
         `,
