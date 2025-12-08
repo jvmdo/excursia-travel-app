@@ -2,22 +2,24 @@
 
 import { Button } from "@/components/ui/button";
 
-export function ChatInput({
-  value,
-  onChange,
-  onSend,
-  disabled,
-}: {
+interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
   disabled: boolean;
-}) {
+}
+
+export function ChatInput({
+  value,
+  disabled,
+  onChange,
+  onSend,
+}: ChatInputProps) {
   return (
     <div className="border-t p-3 gap-2 flex">
       <input
         type="text"
-        placeholder="💭 Digite sua pergunta..."
+        placeholder="💭 Digite sua pergunta"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onSend()}
@@ -26,7 +28,7 @@ export function ChatInput({
       <Button
         onClick={onSend}
         disabled={disabled}
-        className="rounded-full px-3"
+        className="rounded-full px-3 bg-sky-500 hover:bg-purple-400 transition-colors duration-300"
       >
         ➤
       </Button>

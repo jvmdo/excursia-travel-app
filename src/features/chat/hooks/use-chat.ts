@@ -1,56 +1,55 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import {
-  sendChatMessage,
-  ChatMessage,
-} from "@/features/chat/api/send-chat-message";
+import { ChatMessageData } from "@/app/api/chat-travel/route";
+import { sendChatMessage } from "@/features/chat/api/send-chat-message";
+import { useState } from "react";
 
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [data, setData] = useState<ChatMessageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const send = useCallback(
-    async (text: string) => {
-      const trimmed = text.trim();
-      if (!trimmed) return;
-
-      const userMessage: ChatMessage = {
+  const sendMessage = async (content: string) => {
+    const userMessage: ChatMessageData = {
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      message: {
         role: "user",
-        content: trimmed,
-      };
+        content,
+      },
+    };
 
-      setMessages((prev) => [...prev, userMessage]);
-      setIsLoading(true);
+    setData((currentData) => [...currentData, userMessage]);
+    await send(content);
+  };
 
-      try {
-        const response = await sendChatMessage({
-          message: trimmed,
-          history: [...messages, userMessage],
-        });
+  const retryLastMessage = async () => {
+    send(data.at(-1)?.message.content!);
+  };
 
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: response.mensagem },
-        ]);
-      } catch {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "❌ Erro: não consegui responder. Tente novamente.",
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [messages]
-  );
+  const send = async (content: string) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const assistantResponse = await sendChatMessage({
+        content,
+        history: data.map(({ message }) => message),
+      });
+
+      setData((currentData) => [...currentData, assistantResponse]);
+    } catch (err) {
+      setError((err as TypeError).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
-    messages,
+    data,
     isLoading,
-    send,
+    error,
+    sendMessage,
+    retryLastMessage,
   };
 }

@@ -1,20 +1,8 @@
-export interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface SendChatMessageParams {
-  message: string;
-  history: ChatMessage[];
-}
-
-export interface SendChatMessageResponse {
-  mensagem: string;
-}
+import { ChatMessageData, SendChatMessage } from "@/app/api/chat-travel/route";
 
 export async function sendChatMessage(
-  params: SendChatMessageParams
-): Promise<SendChatMessageResponse> {
+  params: SendChatMessage
+): Promise<ChatMessageData> {
   const response = await fetch("/api/chat-travel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -22,13 +10,14 @@ export async function sendChatMessage(
   });
 
   if (!response.ok) {
-    let message = "Erro no chat";
-    try {
-      const json = await response.json();
-      message = json.erro ?? message;
-    } catch {}
-    throw new Error(message);
+    const json = await response.json().catch(() => ({}));
+    throw new Error(
+      json?.error ||
+        "Assistente muito ocupado no momento. Por favor, tente novamente mais tarde."
+    );
   }
 
-  return response.json();
+  const json = await response.json();
+
+  return json;
 }

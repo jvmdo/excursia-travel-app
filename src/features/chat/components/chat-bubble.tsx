@@ -1,18 +1,28 @@
 "use client";
 
-import { ChatMessage } from "@/features/chat/api/send-chat-message";
+import { ChatMessage } from "@/app/api/chat-travel/route";
+import { ComponentPropsWithRef } from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-export function ChatBubble({ message }: { message: ChatMessage }) {
+interface ChatBubbleProps extends ComponentPropsWithRef<"div"> {
+  message: ChatMessage;
+}
+
+export function ChatBubble({ ref, message }: ChatBubbleProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div
+      ref={ref}
+      className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+    >
       <div
         className={`max-w-xs px-4 py-2 rounded-lg text-sm mb-2 ${
           isUser ? "bg-sky-500 text-white" : "bg-border text-foreground"
         }`}
       >
-        {message.content}
+        <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
       </div>
     </div>
   );

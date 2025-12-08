@@ -2,10 +2,6 @@
 
 ## TODO
 
-- Chat
-  - Answer formatting: what is a good chat formatting?
-  - Use a proper model for chatting. Configure for small payload.
-
 - Toast
   - Replace this shit by something better
   
