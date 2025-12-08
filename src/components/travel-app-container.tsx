@@ -1,6 +1,5 @@
 "use client";
 
-import { Toaster } from "@/components/ui/toaster";
 import { ItineraryContainer } from "@/features/itinerary/itinerary-container";
 import { AuthFeature } from "@/features/auth/containers/auth-feature";
 import ChatWidgetContainer from "@/features/chat/chat-widget-container";
@@ -28,7 +27,6 @@ function TravelAppContainer() {
       </main>
 
       <ChatWidgetContainer />
-      <Toaster />
       {/* <PWAInstallButton /> */}
     </div>
   );

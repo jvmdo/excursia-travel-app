@@ -4,28 +4,27 @@ import { useCallback } from "react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { ConfirmLogoutDialog } from "@/features/auth/components/confirm-logout-dialog";
-import { useToast } from "@/hooks/use-toast";
 
+// TODO: toast
 export function AuthFeature() {
   const { logoutDialogOpen, setLogoutDialogOpen, signOut } = useAuth();
-  const { toast } = useToast();
 
   const handleConfirmLogout = useCallback(async () => {
     const result = await signOut();
     if (result.success) {
-      toast({
+      console.log({
         title: "Até logo!",
         description: "Você foi desconectado com sucesso.",
       });
     } else {
-      toast({
+      console.log({
         title: "❌ Erro ao desconectar",
         description: result.error ?? "Tente novamente.",
         variant: "destructive",
       });
     }
     setLogoutDialogOpen(false);
-  }, [signOut, setLogoutDialogOpen, toast]);
+  }, [signOut, setLogoutDialogOpen]);
 
   return (
     <>
