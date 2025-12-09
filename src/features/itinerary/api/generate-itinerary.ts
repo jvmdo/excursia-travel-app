@@ -1,15 +1,10 @@
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
-
-export interface GenerateItineraryParams {
-  destination: string;
-  days: number;
-  preferences: string;
-}
+import { ItineraryFormValues } from "@/features/itinerary/components/itinerary-form";
 
 // TODO Place underlying hook in this file
 
 export async function generateItinerary(
-  params: GenerateItineraryParams
+  params: ItineraryFormValues
 ): Promise<ItineraryData> {
   const response = await fetch("/api/generate-itinerary", {
     method: "POST",

@@ -1,6 +1,9 @@
 "use client";
 
-import { ItineraryForm } from "@/features/itinerary/components/itinerary-form";
+import {
+  ItineraryForm,
+  ItineraryFormValues,
+} from "@/features/itinerary/components/itinerary-form";
 import { SavedItineraryList } from "@/features/itinerary/components/saved-itinerary-list";
 import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
 import { useSavedItineraries } from "@/features/itinerary/hooks/use-saved-itineraries";
@@ -16,13 +19,9 @@ export function ItineraryContainer() {
 
   const { saved, add, remove, load } = useSavedItineraries();
 
-  const handleSubmit = async (values: {
-    days: number;
-    destination: string;
-    preferences: string;
-  }) => {
+  const handleSubmit = async (data: ItineraryFormValues) => {
     try {
-      const newItinerary = await generate(values);
+      const newItinerary = await generate(data);
 
       setItinerary(newItinerary);
       add(newItinerary);

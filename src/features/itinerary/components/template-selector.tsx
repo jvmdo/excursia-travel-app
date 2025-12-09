@@ -4,42 +4,42 @@ export const TEMPLATES = [
   {
     icon: "⛰️",
     label: "Aventura",
-    value: "Aventura, trilhas e paisagens naturais",
+    value: "Aventura, trilhas, paisagens naturais",
   },
   {
     icon: "🏛️",
     label: "Cultura",
-    value: "Museus, história e gastronomia local",
+    value: "Museus, história, gastronomia local",
   },
   {
     icon: "🏖️",
     label: "Praia",
-    value: "Praias, relaxamento e vida noturna",
+    value: "Praias, relaxamento, vida noturna",
   },
   {
     icon: "💸",
     label: "Low Cost",
-    value: "Viagem econômica, passeios gratuitos e transporte barato",
+    value: "Viagem econômica, passeios gratuitos, transporte barato",
   },
 ];
 
-export function TemplateSelector({
-  onSelect,
-}: {
+interface PreferencesTemplatesProps {
   onSelect: (templateValue: string) => void;
-}) {
+}
+
+export function PreferencesTemplates({ onSelect }: PreferencesTemplatesProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
-      {TEMPLATES.map((tpl) => (
+    <div className="flex flex-wrap gap-2 mb-8 mt-2">
+      {TEMPLATES.map(({ icon, label, value }) => (
         <button
-          key={tpl.label}
-          onClick={() => onSelect(tpl.value)}
-          className="px-2 py-1 rounded-lg border border-border bg-white shadow-sm
-                     hover:bg-accent transition-all flex items-center gap-2
-                     hover:scale-[1.03] active:scale-95 text-sm"
+          key={label}
+          type="button"
+          onClick={() => onSelect(value)}
+          className="flex items-center gap-2 text-sm px-2 py-1 rounded-lg border shadow-sm 
+                     transition-all hover:bg-accent hover:scale-[1.03] active:scale-95"
         >
-          <span className="text-sm animate-pulse">{tpl.icon}</span>
-          {tpl.label}
+          <span className="text-sm animate-pulse">{icon}</span>
+          {label}
         </button>
       ))}
     </div>

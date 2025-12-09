@@ -1,95 +1,168 @@
 "use client";
 
-import { useState } from "react";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { TemplateSelector } from "@/features/itinerary/components/template-selector";
+import { PreferencesTemplates } from "@/features/itinerary/components/template-selector";
+import { cn } from "@/lib/utils";
 
-export interface ItineraryFormValues {
-  destination: string;
-  days: number;
-  preferences: string;
-}
+const ItineraryFormSchema = z.object({
+  days: z.coerce
+    .number<number>()
+    .positive({ error: "Informe um número entre 1 e 10" })
+    .min(1, { error: "Mínimo: 1 dia" })
+    .max(10, { error: "Máximo: 10 dias" }),
+  destination: z.string().min(2, { error: "Informe um destino válido" }),
+  preferences: z.string().max(60).optional(),
+});
 
-export function ItineraryForm({
-  onSubmit,
-  isLoading,
-}: {
+export type ItineraryFormValues = z.infer<typeof ItineraryFormSchema>;
+
+interface ItineraryFormProps {
   onSubmit: (values: ItineraryFormValues) => void;
   isLoading: boolean;
-}) {
-  const [destination, setDestination] = useState("");
-  const [days, setDays] = useState("");
-  const [preferences, setPreferences] = useState("");
+}
 
-  const handleInsertTemplate = (text: string) => {
-    setPreferences(text);
-  };
-
-  const handleSubmit = () => {
-    const parsed = Number(days);
-    if (!destination || !parsed) return;
-    onSubmit({ destination, days: parsed, preferences });
-  };
+export function ItineraryForm({ onSubmit, isLoading }: ItineraryFormProps) {
+  const { handleSubmit, control } = useForm({
+    resolver: zodResolver(ItineraryFormSchema),
+    defaultValues: {
+      days: 0,
+      destination: "",
+      preferences: "",
+    },
+  });
 
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-white shadow">
-      <h2 className="text-lg flex items-center gap-2 font-bold">
+    <Card className="gap-4">
+      <CardTitle className="px-4 text-lg font-bold">
         <span>🎯</span> Detalhes do Roteiro
-      </h2>
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ls">
-          ✈️
-        </span>
-        <Input
-          placeholder="Destino (ex.: Porto de galinhas em Ipojuca, Pernambuco)"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          className="pl-10 text-sm"
-        />
-      </div>
+      </CardTitle>
 
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg">
-          📅
-        </span>
-        <Input
-          type="number"
-          placeholder="Quantos dias de viagem?"
-          min={1}
-          max={30}
-          value={days}
-          onChange={(e) => setDays(e.target.value)}
-          className="pl-10 text-sm"
-        />
-      </div>
+      <CardContent className="px-4">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate={true}>
+          <FieldGroup className="flex flex-col gap-4">
+            <Controller
+              name="destination"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field className="gap-0.5" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-destination">Destino</FieldLabel>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ls">
+                      ✈️
+                    </span>
+                    <Input
+                      {...field}
+                      id="form-destination"
+                      className="pl-10 text-sm"
+                      placeholder="Porto de galinhas em Ipojuca, Pernambuco"
+                      autoComplete="off"
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-      <div className="relative mb-1">
-        <span className="absolute left-3 top-3 text-lg">🧭</span>
+            <Controller
+              name="days"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field className="gap-0.5" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-days">Dias</FieldLabel>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ls">
+                      📅
+                    </span>
+                    <Input
+                      {...field}
+                      id="form-days"
+                      type="number"
+                      min={1}
+                      max={10}
+                      className="pl-10 text-sm"
+                      placeholder="Quantos dias de viagem? Ex.: 5"
+                      autoComplete="off"
+                      aria-invalid={fieldState.invalid}
+                      value={field.value || ""} // Make sure placeholder is shown
+                    />
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-        <Textarea
-          placeholder="Escreva suas preferências ou selecione dentre as pré-definidas abaixo"
-          value={preferences}
-          onChange={(e) => setPreferences(e.target.value)}
-          maxLength={60}
-          className="pl-10 min-h-24 text-sm"
-        />
+            <Controller
+              name="preferences"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field className="gap-0.5" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-preferences">
+                    Preferências (opcional)
+                  </FieldLabel>
+                  <InputGroup className="relative">
+                    <InputGroupText className="absolute left-3 top-3 text-lg">
+                      🧭
+                    </InputGroupText>
+                    <InputGroupTextarea
+                      {...field}
+                      id="form-preferences"
+                      className="min-h-24 resize-none text-sm pl-10"
+                      placeholder="Escreva suas preferências ou selecione dentre as pré-definidas abaixo"
+                      rows={3}
+                      maxLength={60}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {field.value && (
+                      <InputGroupText
+                        className={cn(
+                          "tabular-nums text-xs absolute right-3 bottom-3",
+                          field.value.length >= 60 && "text-red-500"
+                        )}
+                      >
+                        {field.value.length}/60
+                      </InputGroupText>
+                    )}
+                  </InputGroup>
 
-        <div className="text-xs text-muted-foreground text-right mt-1">
-          {preferences.length}/60
-        </div>
-      </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
 
-      <TemplateSelector onSelect={handleInsertTemplate} />
+                  <PreferencesTemplates onSelect={field.onChange} />
+                </Field>
+              )}
+            />
+          </FieldGroup>
 
-      <Button
-        disabled={isLoading}
-        onClick={handleSubmit}
-        className="cursor-pointer w-full bg-linear-to-r from-sky-500 to-cyan-400 text-white py-6"
-      >
-        {isLoading ? "⏳ Gerando roteiro..." : "✨ Gerar Roteiro Completo"}
-      </Button>
-    </div>
+          <Button
+            disabled={isLoading}
+            className="cursor-pointer w-full bg-linear-to-r from-sky-500 to-cyan-400 text-white py-6"
+          >
+            {isLoading ? "⏳ Gerando roteiro..." : "✨ Gerar Roteiro Completo"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

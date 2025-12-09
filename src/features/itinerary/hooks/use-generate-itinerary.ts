@@ -1,16 +1,14 @@
 import { useState, useCallback } from "react";
 
-import {
-  generateItinerary,
-  GenerateItineraryParams,
-} from "@/features/itinerary/api/generate-itinerary";
+import { generateItinerary } from "@/features/itinerary/api/generate-itinerary";
+import { ItineraryFormValues } from "@/features/itinerary/components/itinerary-form";
 
 // TODO: useItinerary that returns either itinerary or error?
 export function useGenerateItinerary() {
   const [isLoading, setIsLoading] = useState(false);
 
   const generate = useCallback(
-    async (itineraryDetails: GenerateItineraryParams) => {
+    async (itineraryDetails: ItineraryFormValues) => {
       setIsLoading(true);
 
       try {
