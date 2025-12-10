@@ -5,6 +5,10 @@ import dedent from "dedent";
 import Groq from "groq-sdk";
 import pRetry from "p-retry";
 
+const MAX_ITINERARY_COMPLETION_TOKENS = Number(
+  process.env.MAX_ITINERARY_COMPLETION_TOKENS ?? 2000
+);
+
 const ItineraryDaySchema = z.object({
   day: z.number(),
   title: z.string(),
@@ -51,8 +55,8 @@ export async function POST(request: NextRequest) {
       }
     );
     const content = response.choices[0].message.content ?? "{}";
-    console.log(response);
-    console.log(content);
+    // console.log(response);
+    // console.log(content);
     const groqChoices = JSON.parse(content);
     const itineraryData: ItineraryData = {
       id: response.id,
@@ -112,7 +116,7 @@ async function getGroqChatCompletion(prompt: string) {
               - O título não deve conter o número do dia. Por exemplo, "Dia 1: Explorando..." não é válido. O correto é "Explorando...".
               - Inclua emojis no título e no conteúdo.
               - Não inclua as dicas no conteúdo, elas são exclusivas do campo "tips" do schema fornecido.
-              - Não inclua dicas duplicadas. Se não houver dicas diferentes para cada dia, inclua-as somente no último dia.
+              - Se não existirem dicas distintas para cada dia, não repita dicas! Em vez disso, agrupe todas as dicas idênticas ou genéricas e apresente-as apenas no último dia do itinerário.
 
             Seja amigável e inspirador.
             Responda em Português do Brasil.
@@ -129,7 +133,7 @@ async function getGroqChatCompletion(prompt: string) {
     ],
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.8,
-    max_completion_tokens: 2000,
+    max_completion_tokens: MAX_ITINERARY_COMPLETION_TOKENS,
     stream: false,
     response_format: {
       type: "json_schema",

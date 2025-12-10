@@ -5,6 +5,10 @@ import z from "zod";
 import pRetry from "p-retry";
 import { Groq } from "groq-sdk";
 
+const MAX_CHAT_COMPLETION_TOKENS = Number(
+  process.env.MAX_CHAT_COMPLETION_TOKENS ?? 500
+);
+
 const ChatMessageSchema = z.object({
   role: z.literal(["assistant", "user"]),
   content: z.string(),
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(parsed.data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Falha ao responder. Por favor, tente novamente." },
       { status: 500 }
@@ -109,7 +113,7 @@ async function getGroqChatCompletion(prompt: string, history: ChatMessage[]) {
     ],
     model: "compound-beta-mini",
     temperature: 0.4,
-    max_completion_tokens: 500,
+    max_completion_tokens: MAX_CHAT_COMPLETION_TOKENS,
     stream: false,
     response_format: {
       type: "text",
