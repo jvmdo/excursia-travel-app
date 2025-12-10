@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -16,9 +18,11 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { PreferencesTemplates } from "@/features/itinerary/components/template-selector";
 import { cn } from "@/lib/utils";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
+import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
+import AnnButton from "@/features/itinerary/components/ann-button";
 
 const ItineraryFormSchema = z.object({
   days: z.coerce
@@ -33,12 +37,15 @@ const ItineraryFormSchema = z.object({
 export type ItineraryFormValues = z.infer<typeof ItineraryFormSchema>;
 
 interface ItineraryFormProps {
-  onSubmit: (values: ItineraryFormValues) => void;
-  isLoading: boolean;
+  setItinerary: (itinerary: ItineraryData) => void;
+  saveItinerary: (itinerary: ItineraryData) => void;
 }
 
-export function ItineraryForm({ onSubmit, isLoading }: ItineraryFormProps) {
-  const { handleSubmit, control } = useForm({
+export function ItineraryForm({
+  setItinerary,
+  saveItinerary,
+}: ItineraryFormProps) {
+  const { handleSubmit, control, formState, reset, setError } = useForm({
     resolver: zodResolver(ItineraryFormSchema),
     defaultValues: {
       days: 0,
@@ -46,6 +53,33 @@ export function ItineraryForm({ onSubmit, isLoading }: ItineraryFormProps) {
       preferences: "",
     },
   });
+  const { generate } = useGenerateItinerary();
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+
+  const handleGenerateItinerary = async (data: ItineraryFormValues) => {
+    try {
+      const newItinerary = await generate(data);
+      setTimeout(() => reset({}, { keepValues: true }), 5000);
+      setItinerary(newItinerary);
+      saveItinerary(newItinerary);
+    } catch {
+      setError("root.api", { type: "API Error" });
+    }
+  };
+
+  const status = formState.errors.root?.api
+    ? "error"
+    : formState.isSubmitSuccessful
+    ? "success"
+    : formState.isSubmitting
+    ? "processing"
+    : "idle";
+
+  useEffect(() => {
+    if (status === "success") {
+      btnRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [status, btnRef]);
 
   return (
     <Card className="gap-4">
@@ -54,7 +88,10 @@ export function ItineraryForm({ onSubmit, isLoading }: ItineraryFormProps) {
       </CardTitle>
 
       <CardContent className="px-4">
-        <form onSubmit={handleSubmit(onSubmit)} noValidate={true}>
+        <form
+          onSubmit={handleSubmit(handleGenerateItinerary)}
+          noValidate={true}
+        >
           <FieldGroup className="flex flex-col gap-4">
             <Controller
               name="destination"
@@ -155,12 +192,7 @@ export function ItineraryForm({ onSubmit, isLoading }: ItineraryFormProps) {
             />
           </FieldGroup>
 
-          <Button
-            disabled={isLoading}
-            className="cursor-pointer w-full bg-linear-to-r from-sky-500 to-cyan-400 text-white py-6"
-          >
-            {isLoading ? "⏳ Gerando roteiro..." : "✨ Gerar Roteiro Completo"}
-          </Button>
+          <AnnButton ref={btnRef} status={status} />
         </form>
       </CardContent>
     </Card>
