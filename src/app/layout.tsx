@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 const appFont = Inter({
   subsets: ["latin"],
@@ -66,7 +67,14 @@ export default function RootLayout({
         />
         <meta name="theme-color" content="#0ea5e9" />
       </head>
-      <body className={`font-sans antialiased`}>{children}</body>
+      <body className={`font-sans antialiased`}>
+        {
+          <>
+            {children}
+            <Toaster richColors />
+          </>
+        }
+      </body>
     </html>
   );
 }
