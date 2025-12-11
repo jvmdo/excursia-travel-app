@@ -24,7 +24,9 @@ export function useChat() {
   };
 
   const retryLastMessage = async () => {
-    send(data.at(-1)?.message.content!);
+    const content = data.at(-1)?.message.content;
+    if (!content) return;
+    send(content);
   };
 
   const send = async (content: string) => {

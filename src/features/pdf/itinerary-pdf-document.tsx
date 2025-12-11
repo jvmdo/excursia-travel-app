@@ -86,7 +86,7 @@ function InlineMdToPdfComponents({ md }: { md: string }) {
 
   tokens.forEach((block, blockIndex) => {
     if (block.type === "paragraph") {
-      block.tokens?.forEach((token: any, tokenIndex: number) => {
+      block.tokens?.forEach((token, tokenIndex: number) => {
         const key = `${blockIndex}-${tokenIndex}`;
 
         switch (token.type) {
