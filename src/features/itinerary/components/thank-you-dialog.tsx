@@ -6,11 +6,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ReactElement } from "react";
+import { ComponentProps, ReactElement } from "react";
 
-function ThankYouDialog({ children }: { children: ReactElement }) {
+interface ThankYouDialogProps extends ComponentProps<typeof Dialog> {
+  children: ReactElement;
+}
+
+function ThankYouDialog({ children, open, onOpenChange }: ThankYouDialogProps) {
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

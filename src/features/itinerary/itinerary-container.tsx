@@ -6,8 +6,8 @@ import { SavedItineraryList } from "@/features/itinerary/components/saved-itiner
 import { useSavedItineraries } from "@/features/itinerary/hooks/use-saved-itineraries";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { ItinerarySection } from "@/features/itinerary/components/itinerary-section";
+import { toast } from "sonner";
 
-// TODO: toast
 export function ItineraryContainer() {
   const [itinerary, setItinerary] = useState<ItineraryData>();
   const { add, saved, remove, load } = useSavedItineraries();
@@ -16,18 +16,15 @@ export function ItineraryContainer() {
     const itinerary = load(id);
 
     if (!itinerary) {
-      console.log({
-        title: "❌ Erro carregar roteiro",
+      toast.error("Falha ao carregar roteiro", {
         description: "Roteiro não encontrado no dispositivo",
-        variant: "destructive",
       });
       return;
     }
 
     setItinerary(itinerary);
 
-    console.log({
-      title: "📂 Roteiro carregado",
+    toast.success("Roteiro carregado", {
       description: `Exibindo itinerário para ${itinerary.destination}.`,
     });
   };

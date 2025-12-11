@@ -5,12 +5,16 @@ import { MarkdownRenderer } from "@/features/itinerary/components/markdown-rende
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import ThankYouDialog from "@/features/itinerary/components/thank-you-dialog";
 import { MapPinned } from "lucide-react";
+import { toast } from "sonner";
+import React from "react";
 
 interface ItinerarySectionProps {
   itinerary: ItineraryData;
 }
 
 export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
+  const [open, setOpen] = React.useState(false);
+
   const handleGeneratePdf = async (itinerary: ItineraryData) => {
     try {
       const res = await fetch("/api/pdf-session", {
@@ -19,9 +23,12 @@ export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
         body: JSON.stringify(itinerary),
       });
 
-      // TODO: Show error toast
       if (!res.ok) {
-        console.error("Failed to create PDF session");
+        setOpen(false);
+        toast.error("Falha ao gerar PDF", {
+          description:
+            "Atualize a página, recupere seu itinerário dentre os armazenados e tente novamente.",
+        });
         return;
       }
 
@@ -39,7 +46,7 @@ export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
           <span className="animate-pulse">✨</span> Seu Roteiro
         </CardTitle>
         <div className="flex gap-4 justify-self-center">
-          <ThankYouDialog>
+          <ThankYouDialog open={open} onOpenChange={setOpen}>
             <button
               className="transition-all hover:scale-105 cursor-pointer w-28"
               onClick={() => handleGeneratePdf(itinerary)}
