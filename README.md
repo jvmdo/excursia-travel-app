@@ -1,20 +1,16 @@
 # Excursia Travel App
 
 ## TODO
-
-- Toast
-  - Check is its necessary
   
-- Itinerary list
-  - Fix: card date
-  - Feat: database
-
 - OnProfit Webhook API
 
 - Tabs
   - Gerar roteiro
   - Meus roteiros
 
+- Itinerary list
+  - Feat: database
+  
 - PWA
   - Install button
   

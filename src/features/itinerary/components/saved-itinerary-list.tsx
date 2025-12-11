@@ -1,17 +1,19 @@
 "use client";
 
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { SavedItineraryItem } from "@/features/itinerary/components/saved-itinerary-item";
-import { Itinerary } from "@/features/itinerary/hooks/use-saved-itineraries";
+
+interface SavedItineraryListProps {
+  itineraries: ItineraryData[];
+  onLoad: (id: string) => void;
+  onDelete: (id: string) => void;
+}
 
 export function SavedItineraryList({
   itineraries,
   onLoad,
   onDelete,
-}: {
-  itineraries: Itinerary[];
-  onLoad: (id: string) => void;
-  onDelete: (id: string) => void;
-}) {
+}: SavedItineraryListProps) {
   if (itineraries.length === 0) return null;
 
   return (
@@ -21,10 +23,10 @@ export function SavedItineraryList({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {itineraries.map((item) => (
+        {itineraries.map((it) => (
           <SavedItineraryItem
-            key={item.id}
-            itinerary={item}
+            key={it.id}
+            itinerary={it}
             onLoad={onLoad}
             onDelete={onDelete}
           />

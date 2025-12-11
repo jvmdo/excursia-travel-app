@@ -1,16 +1,19 @@
 "use client";
 
-import { Itinerary } from "@/features/itinerary/hooks/use-saved-itineraries";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
+import { Trash2 } from "lucide-react";
+
+export interface SavedItineraryItemProps {
+  itinerary: ItineraryData;
+  onLoad: (id: string) => void;
+  onDelete: (id: string) => void;
+}
 
 export function SavedItineraryItem({
   itinerary,
   onLoad,
   onDelete,
-}: {
-  itinerary: Itinerary;
-  onLoad: (id: string) => void;
-  onDelete: (id: string) => void;
-}) {
+}: SavedItineraryItemProps) {
   return (
     <div
       className="relative p-4 border rounded-lg cursor-pointer hover:bg-accent hover:border-sky-400 transition"
@@ -27,13 +30,13 @@ export function SavedItineraryItem({
             onDelete(itinerary.id);
           }}
         >
-          🗑️
+          <Trash2 size={20} className="mx-auto text-gray-600" />
         </button>
       </div>
 
       <div className="text-sm text-muted-foreground">
-        📅 {itinerary.days} dias •{" "}
-        {new Date(itinerary.date).toLocaleDateString("pt-BR")}
+        📅 {itinerary.numberOfDays} dias •{" "}
+        {new Date(itinerary.createdAt * 1000).toLocaleDateString("pt-BR")}
       </div>
     </div>
   );
