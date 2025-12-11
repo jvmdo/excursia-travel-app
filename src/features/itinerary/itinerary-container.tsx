@@ -10,10 +10,11 @@ import { toast } from "sonner";
 
 export function ItineraryContainer() {
   const [itinerary, setItinerary] = useState<ItineraryData>();
-  const { add, saved, remove, load } = useSavedItineraries();
+  const { saveItinerary, itineraries, removeItinerary, loadItinerary } =
+    useSavedItineraries();
 
   const handleLoad = (id: string) => {
-    const itinerary = load(id);
+    const itinerary = loadItinerary(id);
 
     if (!itinerary) {
       toast.error("Falha ao carregar roteiro", {
@@ -31,14 +32,17 @@ export function ItineraryContainer() {
 
   return (
     <div className="space-y-8 mt-6">
-      <ItineraryForm setItinerary={setItinerary} saveItinerary={add} />
+      <ItineraryForm
+        setItinerary={setItinerary}
+        saveItinerary={saveItinerary}
+      />
 
       {itinerary && <ItinerarySection itinerary={itinerary} />}
 
       <SavedItineraryList
-        itineraries={saved}
+        itineraries={itineraries}
         onLoad={handleLoad}
-        onDelete={remove}
+        onDelete={removeItinerary}
       />
     </div>
   );

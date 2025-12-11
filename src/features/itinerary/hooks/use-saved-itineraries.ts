@@ -1,57 +1,41 @@
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 export function useSavedItineraries() {
-  const [saved, setSaved] = useState<ItineraryData[]>([]);
+  const [itineraries, setItineraries] = useState<ItineraryData[]>([]);
 
-  // Load from localStorage only on client
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const raw = localStorage.getItem("itineraries");
-    if (raw) {
-      try {
-        setSaved(JSON.parse(raw));
-      } catch {
-        setSaved([]);
-      }
-    }
+    const parsed = raw ? JSON.parse(raw) : [];
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setItineraries(parsed);
   }, []);
 
-  // Writes to localStorage
-  const persist = useCallback((items: ItineraryData[]) => {
-    setSaved(items);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("itineraries", JSON.stringify(items));
-    }
-  }, []);
+  useEffect(() => {
+    if (!itineraries.length) return;
+    localStorage.setItem("itineraries", JSON.stringify(itineraries));
+  }, [itineraries]);
 
-  const add = useCallback(
-    (item: ItineraryData) => {
-      const updated = [item, ...saved].slice(0, 10);
-      persist(updated);
-    },
-    [saved, persist]
-  );
+  const saveItinerary = (item: ItineraryData) => {
+    const newItems = [item, ...itineraries];
+    setItineraries(newItems);
+  };
 
-  const remove = useCallback(
-    (id: string) => {
-      const updated = saved.filter((itinerary) => itinerary.id !== id);
-      persist(updated);
-    },
-    [saved, persist]
-  );
+  const removeItinerary = (id: string) => {
+    const filteredItems = itineraries.filter(
+      (itinerary) => itinerary.id !== id
+    );
+    setItineraries(filteredItems);
+  };
 
-  const load = useCallback(
-    (id: string): ItineraryData | undefined => {
-      return saved.find((itinerary) => itinerary.id === id);
-    },
-    [saved]
-  );
+  const loadItinerary = (id: string): ItineraryData | undefined => {
+    return itineraries.find((itinerary) => itinerary.id === id);
+  };
 
   return {
-    saved,
-    add,
-    remove,
-    load,
+    itineraries,
+    saveItinerary,
+    removeItinerary,
+    loadItinerary,
   };
 }
