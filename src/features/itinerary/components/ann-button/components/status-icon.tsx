@@ -17,8 +17,6 @@ export function StatusIcon({ status }: ButtonIconProps) {
     );
   }
 
-  // TODO: replace by lucide icons
-
   if (status === "success") {
     return (
       <svg

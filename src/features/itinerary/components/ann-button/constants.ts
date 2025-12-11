@@ -2,8 +2,7 @@ import { IPosition } from "@/features/itinerary/components/ann-button/types";
 
 export const BRAIN_SIZE_FACTOR = 2.75;
 
-// TODO: rename to NODE_
-export const BRAIN_POSITIONS: IPosition[] = [
+export const NODE_POSITIONS: IPosition[] = [
   { x: 0, y: -15 },
   { x: 8, y: -12 },
   { x: 12, y: -5 },
@@ -19,7 +18,7 @@ export const BRAIN_POSITIONS: IPosition[] = [
   { x: 3, y: 11 },
 ];
 
-export const NUMBER_OF_NODES = BRAIN_POSITIONS.length * 2;
+export const NUMBER_OF_NODES = NODE_POSITIONS.length * 2;
 
 export const CODE_LINES = [
   "import tensorflow as tf",

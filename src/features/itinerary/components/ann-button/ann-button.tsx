@@ -1,13 +1,16 @@
 import { useState, useMemo, useEffect, ComponentPropsWithRef } from "react";
 
-import { generateNodes } from "@/features/itinerary/components/ann-button/helpers";
+import {
+  generateNodes,
+  getNodePosition,
+} from "@/features/itinerary/components/ann-button/helpers";
 import { StatusIcon } from "@/features/itinerary/components/ann-button/components/status-icon";
 import { cn } from "@/lib/utils";
-import { AnimationIdle } from "@/features/itinerary/components/ann-button/components/animation-idle";
 import { ExpandingRings } from "@/features/itinerary/components/ann-button/components/expanding-rings";
 import { ShadowGlow } from "@/features/itinerary/components/ann-button/components/shadow-glow";
 import dynamic from "next/dynamic";
 
+const AnnNode = dynamic(() => import("./components/ann-node"), { ssr: false });
 const AnimationProcessing = dynamic(
   () => import("./components/animation-processing"),
   { ssr: false }
@@ -29,7 +32,8 @@ function AnnButton({ ref, status }: AnnButtonProps) {
   const nodes = useMemo(() => generateNodes(), []);
 
   const isProcessing = status === "processing";
-  const isClickable = status === "idle" || status === "error";
+  const isIdle = status === "idle";
+  const isClickable = isIdle || status === "error";
 
   useEffect(() => {
     if (!isHovered && !isProcessing) return;
@@ -95,7 +99,20 @@ function AnnButton({ ref, status }: AnnButtonProps) {
           {getButtonText()}
         </span>
 
-        <AnimationIdle display={status === "idle"} nodes={nodes} time={time} />
+        {(isIdle || isProcessing) &&
+          nodes.map((node, i) => {
+            const pos = getNodePosition(node, time, isHovered, isProcessing);
+            return (
+              <AnnNode
+                key={`node-${i}`}
+                node={node}
+                position={pos}
+                isProcessing={isProcessing}
+                index={i}
+              />
+            );
+          })}
+
         <AnimationProcessing display={isProcessing} nodes={nodes} time={time} />
         <AnimationSuccess display={status === "success"} />
       </div>

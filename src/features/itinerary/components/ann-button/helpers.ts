@@ -1,5 +1,5 @@
 import {
-  BRAIN_POSITIONS,
+  NODE_POSITIONS,
   BRAIN_SIZE_FACTOR,
   NUMBER_OF_NODES,
 } from "@/features/itinerary/components/ann-button/constants";
@@ -57,7 +57,7 @@ export function getNodePosition(
     const brainCenterY = 50;
     const hemisphere = node.id < NUMBER_OF_NODES / 2 ? -1 : 1;
     const localId = node.id % (NUMBER_OF_NODES / 2);
-    const pos = BRAIN_POSITIONS[localId];
+    const pos = NODE_POSITIONS[localId];
 
     return {
       x: brainCenterX + hemisphere * pos.x * BRAIN_SIZE_FACTOR,

@@ -1,15 +1,24 @@
-import { AnimationProps } from "@/features/itinerary/components/ann-button/components/animation-idle";
-import { BrainNode } from "@/features/itinerary/components/ann-button/components/brain-node";
 import { Synapse } from "@/features/itinerary/components/ann-button/components/synapse";
 import { CODE_LINES } from "@/features/itinerary/components/ann-button/constants";
 import {
   generateSynapses,
   getNodePosition,
 } from "@/features/itinerary/components/ann-button/helpers";
+import { INode } from "@/features/itinerary/components/ann-button/types";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
+import { ComponentProps, useMemo } from "react";
 
-function AnimationProcessing({ nodes, time, display }: AnimationProps) {
+export interface AnimationProcessingProps extends ComponentProps<"div"> {
+  nodes: INode[];
+  time: number;
+  display: boolean;
+}
+
+function AnimationProcessing({
+  nodes,
+  time,
+  display,
+}: AnimationProcessingProps) {
   const synapses = useMemo(
     () => generateSynapses(nodes.length),
     [nodes.length]
@@ -47,11 +56,6 @@ function AnimationProcessing({ nodes, time, display }: AnimationProps) {
           );
         })}
       </svg>
-
-      {nodes.map((node, i) => {
-        const pos = getNodePosition(node, time, undefined, display);
-        return <BrainNode key={`brain-node-${i}`} position={pos} index={i} />;
-      })}
 
       <div className="absolute inset-0 overflow-hidden opacity-20">
         {CODE_LINES.map((code, i) => (
