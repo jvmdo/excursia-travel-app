@@ -1,15 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 export default async function ErrorPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error: string }>
+  searchParams: Promise<{ error: string }>;
 }) {
-  const params = await searchParams
+  const params = await searchParams;
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-sky-500 via-cyan-400 to-orange-400 p-6">
+    <div className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400 p-6">
       <div className="w-full max-w-sm">
         <Card className="shadow-xl">
           <CardHeader className="text-center">
@@ -18,12 +18,19 @@ export default async function ErrorPage({
           </CardHeader>
           <CardContent>
             {params?.error ? (
-              <p className="text-sm text-muted-foreground text-center">Código do erro: {params.error}</p>
+              <p className="text-sm text-muted-foreground text-center">
+                Código do erro: {params.error}
+              </p>
             ) : (
-              <p className="text-sm text-muted-foreground text-center">Ocorreu um erro não especificado.</p>
+              <p className="text-sm text-muted-foreground text-center">
+                Ocorreu um erro não especificado.
+              </p>
             )}
             <div className="mt-4 text-center">
-              <Link href="/auth/login" className="text-sm underline underline-offset-4 text-sky-600">
+              <Link
+                href="/auth/login"
+                className="text-sm underline underline-offset-4 text-sky-600"
+              >
                 Voltar para o login
               </Link>
             </div>
@@ -31,5 +38,5 @@ export default async function ErrorPage({
         </Card>
       </div>
     </div>
-  )
+  );
 }

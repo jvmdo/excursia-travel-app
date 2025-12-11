@@ -57,7 +57,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-sky-500 via-cyan-400 to-orange-400 p-6">
+    <div className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400 p-6">
       <div className="w-full max-w-sm">
         <Card className="shadow-xl">
           <CardHeader className="text-center">

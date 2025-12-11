@@ -19,11 +19,11 @@ export default async function AppPage() {
           <AuthContainer />
         </div>
 
-        <div className="text-5xl mb-2 inline-block animate-bounce">🌍</div>
-        <h1 className="text-3xl font-bold mb-1 drop-shadow-[0_0.5px_0.5px_rgba(0,0,0,0.8)]">
+        <div className="text-5xl mb-2 inline-block animate-float">🌍</div>
+        <h1 className="text-3xl font-bold mb-1 drop-shadow-lg">
           Travelapp by Excursia Viagens
         </h1>
-        <p className="drop-shadow-[0_0.25px_0.25px_rgba(0,0,0,0.8)]">
+        <p className="drop-shadow-lg">
           ✨ Crie roteiros personalizados com inteligência artificial
         </p>
       </header>
