@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,92 +10,133 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import {
+  FieldGroup,
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+} from "@/components/ui/field";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { translateSupabaseError } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
+
+const SignInFormSchema = z.object({
+  email: z.email({ error: "Formato inválido" }),
+  password: z.string().min(6, { error: "Insira pelo menos 6 dígitos" }),
+});
+
+type SignInFormValues = z.infer<typeof SignInFormSchema>;
 
 export default function LoginPage() {
   const supabase = createClient();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { control, handleSubmit, formState } = useForm({
+    resolver: zodResolver(SignInFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+  const handleLogin = async (data: SignInFormValues) => {
+    const { error } = await supabase.auth.signInWithPassword(data);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    if (error) {
+      toast.error("Falha ao acessar", {
+        description: translateSupabaseError(error),
       });
-      if (error) throw error;
-      router.push("/criar-roteiro");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Ocorreu um erro");
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    router.push("/criar-roteiro");
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400 p-6">
-      <div className="w-full max-w-sm">
-        <Card className="shadow-xl">
-          <CardHeader className="text-center">
-            <div className="text-4xl mb-2">🌍</div>
-            <CardTitle className="text-2xl">Entrar</CardTitle>
-            <CardDescription>
-              Entre com seu email para acessar sua conta
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin}>
-              <div className="flex flex-col gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Entrando..." : "Entrar"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Não tem uma conta?{" "}
-                <Link
-                  href="/auth/sign-up"
-                  className="underline underline-offset-4 text-sky-600"
+    <div className="min-h-screen p-6 grid place-items-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400">
+      <Card className="w-full max-w-sm shadow-xl">
+        <CardHeader className="text-center">
+          <span className="text-4xl animate-float">🌍</span>
+          <CardTitle className="text-2xl">Entrar</CardTitle>
+          <CardDescription>
+            Entre com seu email para acessar{" "}
+            <span className="font-semibold text-purple-500">TravelApp</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(handleLogin)}>
+            <FieldGroup>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="email">Email</FieldLabel>
+                      <Input
+                        {...field}
+                        id="email"
+                        type="email"
+                        placeholder="email@example.com"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="password">Senha</FieldLabel>
+                      <Input
+                        {...field}
+                        id="password"
+                        type="password"
+                        placeholder="******"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+
+              <Field>
+                <Button
+                  disabled={formState.isSubmitting}
+                  className="w-full bg-blue-500 hover:bg-blue-700 cursor-pointer"
                 >
-                  Criar conta
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                  {formState.isSubmitting && <Spinner />}
+                  {formState.isSubmitting ? "Acessando..." : "Entrar"}
+                </Button>
+                <FieldDescription className="text-center">
+                  Não tem uma conta?{" "}
+                  <Link
+                    href="/auth/sign-up"
+                    className="text-sky-600 hover:text-sky-500!"
+                  >
+                    Criar conta
+                  </Link>
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

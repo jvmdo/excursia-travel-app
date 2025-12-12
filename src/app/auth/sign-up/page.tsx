@@ -1,6 +1,5 @@
 "use client";
 
-import type React from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,112 +10,176 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import z from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { toast } from "sonner";
+import { translateSupabaseError } from "@/lib/utils";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+
+const SUPABASE_REDIRECT_URL =
+  process.env.NEXT_PUBLIC_APP_URL || `${window.location.origin}/criar-roteiro`;
+
+const SignUpFormSchema = z
+  .object({
+    email: z.email({ error: "Formato inválido" }),
+    password: z.string().min(6, { error: "Insira pelo menos 6 dígitos" }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Senhas devem ser iguais",
+    path: ["confirmPassword"],
+  });
+
+type SignUpFormValues = z.infer<typeof SignUpFormSchema>;
 
 export default function SignUpPage() {
   const supabase = createClient();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { control, handleSubmit, formState } = useForm({
+    resolver: zodResolver(SignUpFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+  const handleSignUp = async (data: SignUpFormValues) => {
+    const { error } = await supabase.auth.signUp({
+      ...data,
+      options: {
+        emailRedirectTo: SUPABASE_REDIRECT_URL,
+      },
+    });
 
-    if (password !== repeatPassword) {
-      setError("As senhas não coincidem");
-      setIsLoading(false);
+    if (error) {
+      toast.error("Falha ao criar conta", {
+        description: translateSupabaseError(error),
+      });
       return;
     }
 
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo:
-            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-            `${window.location.origin}/criar-roteiro`,
-        },
-      });
-      if (error) throw error;
-      router.push("/auth/sign-up-success");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Ocorreu um erro");
-    } finally {
-      setIsLoading(false);
-    }
+    toast.success("Conta criada com sucesso!", {
+      description:
+        "Verifique seu email para confirmar sua conta antes de entrar.",
+      action: {
+        label: "Entrar",
+        onClick: () => router.push("/auth/login"),
+      },
+    });
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400 p-6">
-      <div className="w-full max-w-sm">
-        <Card className="shadow-xl">
-          <CardHeader className="text-center">
-            <div className="text-4xl mb-2">🌍</div>
-            <CardTitle className="text-2xl">Criar Conta</CardTitle>
-            <CardDescription>Crie sua conta para começar</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignUp}>
-              <div className="flex flex-col gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="repeat-password">Repetir Senha</Label>
-                  <Input
-                    id="repeat-password"
-                    type="password"
-                    required
-                    value={repeatPassword}
-                    onChange={(e) => setRepeatPassword(e.target.value)}
-                  />
-                </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Criando conta..." : "Criar Conta"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Já tem uma conta?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4 text-sky-600"
+    <div className="min-h-screen p-6 grid place-items-center bg-linear-to-br from-sky-500 via-cyan-400 to-purple-400">
+      <Card className="w-full max-w-sm shadow-xl">
+        <CardHeader className="text-center">
+          <div className="text-4xl mb-2 animate-float">🌍</div>
+          <CardTitle className="text-2xl">Criar Conta</CardTitle>
+          <CardDescription>Crie sua conta para começar</CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit(handleSignUp)}>
+            <FieldGroup>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="email">Email</FieldLabel>
+                      <Input
+                        {...field}
+                        id="email"
+                        type="email"
+                        placeholder="email@example.com"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="password">Senha</FieldLabel>
+                      <Input
+                        {...field}
+                        id="password"
+                        type="password"
+                        placeholder="******"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="confirmPassword">
+                        Confirmar senha
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="******"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+
+              <Field>
+                <Button
+                  disabled={formState.isSubmitting}
+                  className="w-full bg-blue-500 hover:bg-blue-700 cursor-pointer"
                 >
-                  Entrar
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                  {formState.isSubmitting && <Spinner />}
+                  {formState.isSubmitting ? "Criando..." : "Criar Conta"}
+                </Button>
+
+                <FieldDescription className="text-center">
+                  Já tem uma conta?{" "}
+                  <Link
+                    href="/auth/login"
+                    className="text-sky-600 hover:text-sky-500!"
+                  >
+                    Entrar
+                  </Link>
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

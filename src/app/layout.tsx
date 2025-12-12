@@ -68,12 +68,17 @@ export default function RootLayout({
         <meta name="theme-color" content="#0ea5e9" />
       </head>
       <body className={`font-sans antialiased`}>
-        {
-          <>
-            {children}
-            <Toaster richColors />
-          </>
-        }
+        {children}
+        <Toaster
+          richColors
+          closeButton
+          toastOptions={{
+            classNames: {
+              title: "font-semibold!",
+              actionButton: "bg-blue-500! hover:bg-blue-700!",
+            },
+          }}
+        />
       </body>
     </html>
   );
