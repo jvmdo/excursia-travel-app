@@ -21,8 +21,8 @@ import { Input } from "@/components/ui/input";
 import { PreferencesTemplates } from "@/features/itinerary/components/template-selector";
 import { cn } from "@/lib/utils";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
-import { useGenerateItinerary } from "@/features/itinerary/hooks/use-generate-itinerary";
 import AnnButton from "@/features/itinerary/components/ann-button";
+import { generateItinerary } from "@/features/itinerary/api/generate-itinerary";
 
 const ItineraryFormSchema = z.object({
   days: z.coerce
@@ -53,12 +53,11 @@ export function ItineraryForm({
       preferences: "",
     },
   });
-  const { generate } = useGenerateItinerary();
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
   const handleGenerateItinerary = async (data: ItineraryFormValues) => {
     try {
-      const newItinerary = await generate(data);
+      const newItinerary = await generateItinerary(data);
       setTimeout(() => reset({}, { keepValues: true }), 5000);
       setItinerary(newItinerary);
       saveItinerary(newItinerary);
