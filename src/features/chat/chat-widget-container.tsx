@@ -30,9 +30,10 @@ export default function ChatWidgetContainer() {
       </ChatTooltip>
 
       <PopoverContent
-        className="p-0 shadow-xl"
+        className="p-0 shadow-xl flex flex-col"
         style={{
           width: "min(96vw, 384px)",
+          maxHeight: "var(--radix-popover-content-available-height)",
         }}
         align="end"
       >

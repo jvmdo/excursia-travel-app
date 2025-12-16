@@ -3,6 +3,8 @@
 import { useCallback } from "react";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { translateSupabaseError } from "@/lib/utils";
+import { AuthError } from "@supabase/supabase-js";
 
 export function useAuth() {
   const router = useRouter();
@@ -18,7 +20,7 @@ export function useAuth() {
     } catch (err) {
       return {
         success: false,
-        error: (err as Error).message || "Erro ao desconectar",
+        error: translateSupabaseError(err as AuthError),
       };
     }
   }, [router]);

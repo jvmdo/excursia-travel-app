@@ -92,6 +92,7 @@ function AnnButton({ ref, status }: AnnButtonProps) {
         <span
           className={`
               relative z-20 flex items-center gap-3 left-1/2 top-1/2 -translate-1/2 w-fit 
+              text-sm min-[24rem]:text-base min-[30rem]:text-lg
               drop-shadow-[0_0.5px_0.5px_rgba(0,0,0,0.8)]
           `}
         >

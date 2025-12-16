@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,15 +12,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
-export function ConfirmLogoutDialog({ onConfirm }: { onConfirm: () => void }) {
+export function ConfirmLogoutDialog() {
+  const { signOut } = useAuth();
+
+  const handleConfirmLogout = async () => {
+    const result = await signOut();
+    if (!result.success) {
+      toast.error("Erro ao desconectar", {
+        description: result.error,
+      });
+    }
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          className="bg-white/10 border-white/30 text-white transition-all hover:scale-105 cursor-pointer"
+          className="bg-transparent border-white font-semibold hover:bg-white/10 cursor-pointer hover:text-white"
         >
           👋 Sair
         </Button>
@@ -35,7 +50,9 @@ export function ConfirmLogoutDialog({ onConfirm }: { onConfirm: () => void }) {
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-row flex-wrap *:flex-1">
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Desconectar</AlertDialogAction>
+          <AlertDialogAction onClick={handleConfirmLogout}>
+            Desconectar
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

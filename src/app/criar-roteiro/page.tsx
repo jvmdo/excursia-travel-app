@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AuthContainer } from "@/features/auth/auth-container";
+
 import { ItineraryContainer } from "@/features/itinerary/itinerary-container";
 import ChatWidgetContainer from "@/features/chat/chat-widget-container";
+import { ConfirmLogoutDialog } from "@/components/confirm-logout-dialog";
 
 export default async function AppPage() {
   const supabase = await createClient();
@@ -16,7 +17,7 @@ export default async function AppPage() {
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-orange-50">
       <header className="bg-linear-to-r from-sky-500 via-cyan-400 to-purple-400 text-white py-8 px-4 text-center relative">
         <div className="absolute top-4 right-4">
-          <AuthContainer />
+          <ConfirmLogoutDialog />
         </div>
 
         <div className="text-5xl mb-2 inline-block animate-float">🌍</div>

@@ -24,9 +24,11 @@ export default function HomePage() {
             asChild
             size="lg"
             variant="outline"
-            className="border-white text-white hover:bg-white/10 font-semibold bg-transparent"
+            className="bg-transparent border-white font-semibold hover:bg-white/10"
           >
-            <Link href="/auth/sign-up">Criar Conta</Link>
+            <Link href="/auth/sign-up" className="hover:text-white">
+              Criar Conta
+            </Link>
           </Button>
         </div>
       </div>

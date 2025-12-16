@@ -37,7 +37,10 @@ export function ChatMessageList({
   }, [lastMessageId]);
 
   return (
-    <ScrollArea className="h-80 px-4 py-2 flex flex-col gap-3" ref={bubbleRef}>
+    <ScrollArea
+      className="h-80 px-4 py-2 flex flex-col gap-3 overflow-y-auto"
+      ref={bubbleRef}
+    >
       {messages.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-4">
           👋 Olá! Como posso ajudar com suas viagens?
