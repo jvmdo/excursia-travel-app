@@ -35,7 +35,8 @@ export function SavedItineraryItem({
       </div>
 
       <div className="text-sm text-muted-foreground">
-        📅 {itinerary.numberOfDays} dias •{" "}
+        📅 {itinerary.numberOfDays} dia{itinerary.numberOfDays > 1 && "s"} •{" "}
+        Gerado em{" "}
         {new Date(itinerary.createdAt * 1000).toLocaleDateString("pt-BR")}
       </div>
     </div>

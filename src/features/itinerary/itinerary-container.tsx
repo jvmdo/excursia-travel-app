@@ -56,7 +56,7 @@ export function ItineraryContainer() {
         <TabsTrigger value="my-itineraries">Meus Itinerários</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="generate-itinerary">
+      <TabsContent value="generate-itinerary" forceMount={true}>
         <ItineraryForm
           setItinerary={setNewItinerary}
           saveItinerary={saveItinerary}

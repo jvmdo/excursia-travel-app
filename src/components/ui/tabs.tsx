@@ -59,7 +59,7 @@ function TabsContent({
       data-slot="tabs-content"
       // forceMount={true}
       className={cn(
-        // "data-[state=inactive]:hidden", // forceMount + hidden hack to maintain tab state
+        "data-[state=inactive]:hidden", // forceMount + hidden hack to maintain tab state
         "flex-1 outline-none",
         className
       )}

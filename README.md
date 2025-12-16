@@ -4,9 +4,6 @@
   
 - Embed photos
 
-- Saved itineraries
-  - FIX: user can delete only top 3 itineraries
-
 - OnProfit Webhook API
   - Invite?
 

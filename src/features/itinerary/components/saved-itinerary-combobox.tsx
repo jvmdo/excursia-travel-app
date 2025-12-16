@@ -49,9 +49,8 @@ export function SavedItineraryCombobox({
           )}
         >
           <p className="truncate">
-            {itId
-              ? itineraries.find((it) => it.id === itId)?.destination
-              : "Ver todos os roteiros"}
+            {itineraries.find((it) => it.id === itId)?.destination ??
+              "Ver todos os roteiros"}
           </p>
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -76,7 +75,7 @@ export function SavedItineraryCombobox({
                   <p className="flex flex-col truncate">
                     <span className="truncate">{it.destination}</span>
                     <span className="text-xs text-gray-500">
-                      {it.numberOfDays} •{" "}
+                      {it.numberOfDays} dia{it.numberOfDays > 1 && "s"} •{" "}
                       {new Date(it.createdAt * 1000).toLocaleDateString(
                         "pt-BR"
                       )}

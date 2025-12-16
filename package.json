@@ -28,6 +28,7 @@
     "cmdk": "^1.1.1",
     "dedent": "^1.7.0",
     "emoji-regex": "^10.6.0",
+    "es-toolkit": "^1.43.0",
     "groq-sdk": "^0.37.0",
     "lucide-react": "^0.556.0",
     "marked": "^17.0.1",
