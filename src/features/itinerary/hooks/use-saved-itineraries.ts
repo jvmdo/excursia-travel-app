@@ -22,10 +22,12 @@ export function useSavedItineraries() {
   };
 
   const removeItinerary = (id: string) => {
+    const deletedItem = loadItinerary(id);
     const filteredItems = itineraries.filter(
       (itinerary) => itinerary.id !== id
     );
     setItineraries(filteredItems);
+    return deletedItem;
   };
 
   const loadItinerary = (id: string): ItineraryData | undefined => {

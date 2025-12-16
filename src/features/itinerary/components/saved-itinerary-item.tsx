@@ -16,11 +16,11 @@ export function SavedItineraryItem({
 }: SavedItineraryItemProps) {
   return (
     <div
-      className="relative p-4 border rounded-lg cursor-pointer hover:bg-accent hover:border-sky-400 transition"
+      className="relative p-4 border rounded-lg cursor-pointer hover:bg-sky-50 hover:border-sky-400 transition"
       onClick={() => onLoad(itinerary.id)}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold flex items-center gap-1">
+        <h3 className="font-semibold truncate pr-6">
           🗺️ {itinerary.destination}
         </h3>
         <button

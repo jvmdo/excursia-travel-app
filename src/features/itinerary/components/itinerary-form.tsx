@@ -82,9 +82,9 @@ export function ItineraryForm({
   }, [status, btnRef]);
 
   return (
-    <Card className="gap-4">
+    <Card className="gap-4 mb-4">
       <CardTitle className="px-4 text-lg font-bold">
-        <span>🎯</span> Detalhes do Roteiro
+        🎯 Detalhes do Roteiro
       </CardTitle>
 
       <CardContent className="px-4">

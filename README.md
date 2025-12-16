@@ -2,17 +2,23 @@
 
 ## TODO
   
-- OnProfit Webhook API
+- Embed photos
 
-- Tabs
-  - Gerar roteiro
-  - Meus roteiros
+- Saved itineraries
+  - FIX: user can delete only top 3 itineraries
+
+- OnProfit Webhook API
+  - Invite?
+
+- PWA
+  - Install button
 
 - Itinerary list
   - Feat: database
   
-- PWA
-  - Install button
+- Auth
+  - Forgot password
+  - No need for email verification if webhook is working
   
 - Theme
   - Toggle button
