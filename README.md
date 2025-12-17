@@ -3,9 +3,20 @@
 ## TODO
   
 - Embed photos
+  - New album button: display toast with instructions
+  - Add photos in already created albums
+  - Delete photo/album not deleting underlying bucket file
+  - Delete photo from album leads to a screen trap
+
+- PDF features?
+  - Rename it to itinerary-pdf
+  - Maybe merge with album pdf?
+
+- Supabase
+  - Email template
 
 - OnProfit Webhook API
-  - Invite?
+  - Supabase invite links?
 
 - PWA
   - Install button
