@@ -6,6 +6,7 @@ import { PhotoUploadZone } from "./photo-upload-zone";
 import { PhotoCarousel } from "./photo-carousel";
 import { AlbumExporter } from "./album-exporter";
 import { AlbumCreator } from "./album-creator";
+import { CloudAlbumsViewer } from "./cloud-albums-viewer";
 import {
   Dialog,
   DialogContent,
@@ -26,8 +27,7 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import Image from "next/image";
+import { db } from "@/lib/db";
 
 export interface Photo {
   id: string;
@@ -36,7 +36,6 @@ export interface Photo {
   size: number;
   uploadedAt: Date;
   albumId?: string;
-  userId?: string;
 }
 
 export interface Album {
@@ -56,102 +55,65 @@ export function PhotoGallery() {
   const [renameAlbumId, setRenameAlbumId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteAlbumId, setDeleteAlbumId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const supabase = createClient();
-
   useEffect(() => {
-    loadUserAndData();
+    loadLocalData();
   }, []);
 
-  const loadUserAndData = async () => {
+  const loadLocalData = async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        await loadAlbums(user.id);
-        await loadPhotos(user.id);
+      const localAlbums = await db.albums.toArray();
+      const formattedAlbums: Album[] = [];
+
+      for (const album of localAlbums) {
+        const photoCount = await db.photos
+          .where("albumId")
+          .equals(album.id)
+          .count();
+
+        let coverPhotoUrl: string | undefined;
+        if (album.coverPhotoId) {
+          const coverPhoto = await db.photos.get(album.coverPhotoId);
+          if (coverPhoto) {
+            coverPhotoUrl = URL.createObjectURL(coverPhoto.blob);
+          }
+        }
+
+        formattedAlbums.push({
+          id: album.id,
+          name: album.name,
+          createdAt: album.createdAt,
+          photoCount,
+          coverPhoto: coverPhotoUrl,
+        });
       }
-    } catch (error) {
-      console.error("Erro ao carregar usuário:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const loadAlbums = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("albums")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      setAlbums(
+        formattedAlbums.sort(
+          (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        )
+      );
 
-    if (error) {
-      console.error("Erro ao carregar álbuns:", error);
-      return;
-    }
-
-    if (data) {
-      const formattedAlbums: Album[] = data.map((album) => ({
-        id: album.id,
-        name: album.name,
-        createdAt: new Date(album.created_at),
-        photoCount: 0,
-        coverPhoto: album.cover_url || undefined,
-      }));
-      setAlbums(formattedAlbums);
-
-      // Carregar contagem de fotos para cada álbum
-      for (const album of formattedAlbums) {
-        const { count } = await supabase
-          .from("photos")
-          .select("*", { count: "exact", head: true })
-          .eq("album_id", album.id);
-
-        setAlbums((prev) =>
-          prev.map((a) =>
-            a.id === album.id ? { ...a, photoCount: count || 0 } : a
-          )
-        );
-      }
-    }
-  };
-
-  const loadPhotos = async (userId: string) => {
-    const { data: albumsData } = await supabase
-      .from("albums")
-      .select("id")
-      .eq("user_id", userId);
-
-    if (!albumsData) return;
-
-    const albumIds = albumsData.map((a) => a.id);
-
-    const { data, error } = await supabase
-      .from("photos")
-      .select("*")
-      .in("album_id", albumIds)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Erro ao carregar fotos:", error);
-      return;
-    }
-
-    if (data) {
-      const formattedPhotos: Photo[] = data.map((photo) => ({
+      const localPhotos = await db.photos.toArray();
+      const formattedPhotos: Photo[] = localPhotos.map((photo) => ({
         id: photo.id,
-        url: photo.url,
+        url: URL.createObjectURL(photo.blob),
         name: photo.name,
         size: photo.size,
-        uploadedAt: new Date(photo.created_at),
-        albumId: photo.album_id,
-        userId: photo.user_id,
+        uploadedAt: photo.uploadedAt,
+        albumId: photo.albumId,
       }));
-      setPhotos(formattedPhotos);
+
+      setPhotos(
+        formattedPhotos.sort(
+          (a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime()
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao carregar dados locais:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -166,114 +128,59 @@ export function PhotoGallery() {
 
   const handleDeletePhoto = useCallback(
     async (id: string) => {
-      const photo = photos.find((p) => p.id === id);
+      try {
+        const photo = photos.find((p) => p.id === id);
 
-      const isUUID =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          id
-        );
+        await db.photos.delete(id);
 
-      if (isUUID && photo) {
-        try {
-          // Extrair o caminho do arquivo da URL
-          const url = new URL(photo.url);
-          const pathMatch = url.pathname.match(
-            /\/storage\/v1\/object\/public\/photos\/(.+)$/
+        setPhotos((prev) => prev.filter((p) => p.id !== id));
+
+        if (photo?.albumId) {
+          setAlbums((prev) =>
+            prev.map((album) =>
+              album.id === photo.albumId
+                ? { ...album, photoCount: Math.max(0, album.photoCount - 1) }
+                : album
+            )
           );
-
-          if (pathMatch && pathMatch[1]) {
-            const filePath = pathMatch[1];
-
-            // Deletar do Storage
-            const { error: storageError } = await supabase.storage
-              .from("photos")
-              .remove([filePath]);
-
-            if (storageError) {
-              console.error("Erro ao deletar do storage:", storageError);
-            }
-          }
-
-          // Deletar do banco de dados
-          const { error } = await supabase.from("photos").delete().eq("id", id);
-
-          if (error) {
-            console.error("Erro ao deletar foto:", error);
-            return;
-          }
-        } catch (error) {
-          console.error("Erro ao processar deleção:", error);
-          return;
         }
-      }
-
-      // Remover do estado local independentemente
-      setPhotos((prev) => prev.filter((photo) => photo.id !== id));
-
-      if (photo?.albumId) {
-        setAlbums((prev) =>
-          prev.map((album) =>
-            album.id === photo.albumId
-              ? { ...album, photoCount: Math.max(0, album.photoCount - 1) }
-              : album
-          )
-        );
+      } catch (error) {
+        console.error("Erro ao deletar foto:", error);
       }
     },
-    [photos, supabase]
+    [photos]
   );
 
-  const handleCreateAlbum = useCallback((name: string) => {
-    const newAlbum: Album = {
-      id: `album-${Date.now()}`,
-      name,
-      createdAt: new Date(),
-      photoCount: 0,
-    };
-    setAlbums((prev) => [...prev, newAlbum]);
-    return newAlbum.id;
-  }, []);
-
-  const handleRenameAlbum = useCallback(
-    async (id: string, newName: string) => {
-      const { error } = await supabase
-        .from("albums")
-        .update({ name: newName, updated_at: new Date().toISOString() })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Erro ao renomear álbum:", error);
-        return;
-      }
-
+  const handleRenameAlbum = useCallback(async (id: string, newName: string) => {
+    try {
+      await db.albums.update(id, { name: newName });
       setAlbums((prev) =>
         prev.map((album) =>
           album.id === id ? { ...album, name: newName } : album
         )
       );
-    },
-    [supabase]
-  );
+    } catch (error) {
+      console.error("Erro ao renomear álbum:", error);
+    }
+  }, []);
 
   const handleDeleteAlbum = useCallback(
     async (id: string) => {
-      // Remover fotos do álbum no Supabase (CASCADE já remove automaticamente)
-      const { error } = await supabase.from("albums").delete().eq("id", id);
+      try {
+        await db.photos.where("albumId").equals(id).delete();
+        await db.albums.delete(id);
 
-      if (error) {
+        setPhotos((prev) => prev.filter((photo) => photo.albumId !== id));
+        setAlbums((prev) => prev.filter((album) => album.id !== id));
+
+        if (selectedAlbumId === id) {
+          setSelectedAlbumId(null);
+        }
+      } catch (error) {
         console.error("Erro ao deletar álbum:", error);
-        return;
-      }
-
-      // Remover fotos do estado local
-      setPhotos((prev) => prev.filter((photo) => photo.albumId !== id));
-      setAlbums((prev) => prev.filter((album) => album.id !== id));
-
-      if (selectedAlbumId === id) {
-        setSelectedAlbumId(null);
       }
     },
-    [selectedAlbumId, supabase]
+    [selectedAlbumId]
   );
 
   const handleOpenRename = useCallback(
@@ -313,64 +220,49 @@ export function PhotoGallery() {
 
   const handleCreateAlbumWithPhotos = useCallback(
     async (name: string, coverPhotoUrl?: string) => {
-      if (!userId) return;
+      try {
+        const albumId = `album-${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(7)}`;
 
-      // Criar álbum no Supabase
-      const { data: newAlbumData, error: albumError } = await supabase
-        .from("albums")
-        .insert({
-          user_id: userId,
+        const coverPhotoId = coverPhotoUrl
+          ? unassignedPhotos.find((p) => p.url === coverPhotoUrl)?.id
+          : unassignedPhotos[0]?.id;
+
+        await db.albums.add({
+          id: albumId,
           name,
-          cover_url: coverPhotoUrl,
-        })
-        .select()
-        .single();
+          createdAt: new Date(),
+          coverPhotoId,
+        });
 
-      if (albumError || !newAlbumData) {
-        console.error("Erro ao criar álbum:", albumError);
-        return;
+        const photoIds = unassignedPhotos.map((p) => p.id);
+        await Promise.all(
+          photoIds.map((photoId) => db.photos.update(photoId, { albumId }))
+        );
+
+        const newAlbum: Album = {
+          id: albumId,
+          name,
+          createdAt: new Date(),
+          photoCount: unassignedPhotos.length,
+          coverPhoto: coverPhotoUrl,
+        };
+
+        setPhotos((prev) =>
+          prev.map((photo) =>
+            photoIds.includes(photo.id) ? { ...photo, albumId } : photo
+          )
+        );
+
+        setAlbums((prev) => [newAlbum, ...prev]);
+        setSelectedAlbumId(albumId);
+        setShowThankYouDialog(true);
+      } catch (error) {
+        console.error("Erro ao criar álbum:", error);
       }
-
-      const newAlbum: Album = {
-        id: newAlbumData.id,
-        name: newAlbumData.name,
-        createdAt: new Date(newAlbumData.created_at),
-        photoCount: unassignedPhotos.length,
-        coverPhoto: newAlbumData.cover_url || undefined,
-      };
-
-      const photosToInsert = unassignedPhotos.map((photo) => ({
-        album_id: newAlbum.id,
-        // user_id: userId,
-        url: photo.url,
-        name: photo.name,
-        size: photo.size,
-      }));
-
-      const { error: photosError } = await supabase
-        .from("photos")
-        .insert(photosToInsert);
-
-      if (photosError) {
-        console.error("Erro ao adicionar fotos:", photosError);
-        return;
-      }
-
-      // Atualizar estado local
-      const photoIdsToMove = new Set(unassignedPhotos.map((p) => p.id));
-      setPhotos((prev) =>
-        prev.map((photo) =>
-          photoIdsToMove.has(photo.id)
-            ? { ...photo, albumId: newAlbum.id }
-            : photo
-        )
-      );
-
-      setAlbums((prev) => [...prev, newAlbum]);
-      setSelectedAlbumId(newAlbum.id);
-      setShowThankYouDialog(true);
     },
-    [unassignedPhotos, userId, supabase]
+    [unassignedPhotos]
   );
 
   const handleCreateAnother = useCallback(() => {
@@ -430,6 +322,7 @@ export function PhotoGallery() {
           <FolderOpen className="w-5 h-5" />
           Meus Álbuns ({albums.length})
         </Button>
+        <CloudAlbumsViewer />
       </div>
 
       {viewMode === "create" && (
@@ -462,9 +355,7 @@ export function PhotoGallery() {
 
           {!selectedAlbumId && photos.length === 0 && (
             <div className="text-center py-12 text-muted-foreground animate-float">
-              <p className="text-base md:text-lg">
-                Nenhuma foto ainda. Comece fazendo upload!
-              </p>
+              <p className="text-base md:text-lg">Nenhuma álbum ainda.</p>
             </div>
           )}
         </>
@@ -591,6 +482,7 @@ export function PhotoGallery() {
               albumName={
                 albums.find((a) => a.id === selectedAlbumId)?.name || "Álbum"
               }
+              albumId={selectedAlbumId}
             />
           </div>
 
@@ -601,7 +493,6 @@ export function PhotoGallery() {
         </div>
       )}
 
-      {/* ... existing dialog code ... */}
       <Dialog open={showThankYouDialog} onOpenChange={setShowThankYouDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader className="text-center">
@@ -622,7 +513,7 @@ export function PhotoGallery() {
               Deseja criar outro álbum?
             </p>
             <p className="text-sm text-muted-foreground">
-              Você poderá fazer upload de novas fotos e criar um novo álbum.
+              Você poderá fazer importar novas fotos e criar um novo álbum.
             </p>
           </div>
 
@@ -659,27 +550,19 @@ export function PhotoGallery() {
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="Nome do álbum"
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleConfirmRename();
-                }
+                if (e.key === "Enter") handleConfirmRename();
               }}
-              className="text-base"
               autoFocus
             />
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setRenameAlbumId(null)}
-              className="w-full sm:w-auto bg-transparent"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameAlbumId(null)}>
               Cancelar
             </Button>
             <Button
               onClick={handleConfirmRename}
               disabled={!renameValue.trim()}
-              className="w-full sm:w-auto"
             >
               Salvar
             </Button>
@@ -693,35 +576,19 @@ export function PhotoGallery() {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display text-destructive">
-              Excluir Álbum
-            </DialogTitle>
+            <DialogTitle className="font-display">Deletar Álbum</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir este álbum? As fotos serão
-              excluídas permanentemente.
+              Tem certeza que deseja deletar este álbum? Todas as fotos serão
+              removidas e esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4 text-center">
-            <p className="text-base text-muted-foreground">
-              Esta ação não pode ser desfeita.
-            </p>
-          </div>
-
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteAlbumId(null)}
-              className="w-full sm:w-auto bg-transparent"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteAlbumId(null)}>
               Cancelar
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              className="w-full sm:w-auto"
-            >
-              Excluir Álbum
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Deletar
             </Button>
           </DialogFooter>
         </DialogContent>

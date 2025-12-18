@@ -17,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Excursia Photos | Suas memórias, lindamente organizadas",
-  description: "Faça upload e organize suas fotos de forma simples e elegante",
+  title: "Excursia Photos | Suas memórias organizadas em álbuns",
+  description: "Organize suas fotos de viagem forma simples e elegante",
 };
 
 export default function RootLayout({

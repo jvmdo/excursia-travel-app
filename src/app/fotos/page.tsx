@@ -30,12 +30,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
           <div className="text-center space-y-3 md:space-y-4 animate-slide-up">
             <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-display text-balance leading-tight">
-              Suas fotos, <span className="text-primary">lindamente</span>{" "}
+              Suas fotos <span className="text-primary">lindamente</span>{" "}
               organizadas
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-muted-foreground text-pretty max-w-2xl mx-auto px-2">
-              Faça upload das suas fotos de forma simples e intuitiva. Organize
-              em álbuns e visualize como preferir.
+              Organize suas fotos em álbuns de forma simples e intuitiva.
+              Exporte em PDF para impressão e salve em nuvem se quiser acessar
+              de outros dispositivos.
             </p>
           </div>
 

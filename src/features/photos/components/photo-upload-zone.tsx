@@ -5,8 +5,8 @@ import { useDropzone } from "react-dropzone";
 import { Upload, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Photo } from "./photo-gallery";
-import { createClient } from "@/lib/supabase/client";
 import imageCompression from "browser-image-compression";
+import { db } from "@/lib/db";
 
 interface PhotoUploadZoneProps {
   onPhotosUploaded: (photos: Photo[]) => void;
@@ -14,30 +14,20 @@ interface PhotoUploadZoneProps {
 
 export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const supabase = createClient();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       setIsUploading(true);
 
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) {
-          console.error("Usuário não autenticado");
-          setIsUploading(false);
-          return;
-        }
-
         const newPhotos: Photo[] = await Promise.all(
           acceptedFiles.map(async (file) => {
             const options = {
-              maxSizeMB: 1, // Tamanho máximo de 1MB
-              maxWidthOrHeight: 1920, // Dimensão máxima de 1920px (Full HD)
-              useWebWorker: true, // Usar Web Worker para não travar a UI
-              fileType: file.type, // Manter o tipo original
-              initialQuality: 0.85, // Qualidade inicial de 85% (ótimo balanço)
+              maxSizeMB: 1,
+              maxWidthOrHeight: 1920,
+              useWebWorker: true,
+              fileType: file.type,
+              initialQuality: 0.85,
             };
 
             console.log(`Comprimindo imagem ${file.name}...`);
@@ -61,36 +51,29 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
               ).toFixed(1)}%`
             );
 
-            // Gerar nome único para o arquivo
-            const fileExt = file.name.split(".").pop();
-            const fileName = `${user.id}/${Date.now()}-${Math.random()
+            // Gerar ID único
+            const photoId = `photo-${Date.now()}-${Math.random()
               .toString(36)
-              .substring(7)}.${fileExt}`;
+              .substring(7)}`;
 
-            const { data, error } = await supabase.storage
-              .from("photos")
-              .upload(fileName, compressedFile);
-
-            if (error) {
-              console.error("Erro ao fazer upload:", error);
-              throw error;
-            }
-
-            const { data: signed } = await supabase.storage
-              .from("photos")
-              .createSignedUrl(data.path, 60 * 60 * 24 * 365); // 1 year
-
-            const url = signed?.signedUrl ?? "";
-            const id = Math.random().toString(36).substring(7); // ID temporário, será substituído ao salvar no banco
-            console.log({ id });
-
-            return {
-              id,
-              url,
+            // Salvar no IndexedDB
+            await db.photos.add({
+              id: photoId,
+              blob: compressedFile,
               name: file.name,
               size: compressedFile.size,
               uploadedAt: new Date(),
-              userId: user.id,
+            });
+
+            // Criar URL temporária do blob para exibição
+            const blobUrl = URL.createObjectURL(compressedFile);
+
+            return {
+              id: photoId,
+              url: blobUrl,
+              name: file.name,
+              size: compressedFile.size,
+              uploadedAt: new Date(),
             };
           })
         );
@@ -102,7 +85,7 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
         setIsUploading(false);
       }
     },
-    [onPhotosUploaded, supabase]
+    [onPhotosUploaded]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -154,7 +137,7 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
               : "Arraste suas fotos aqui"}
           </h3>
           <p className="text-muted-foreground max-w-md mx-auto">
-            ou clique para selecionar arquivos do seu computador
+            ou clique para selecionar arquivos do seu dispositivo
           </p>
         </div>
 
