@@ -6,6 +6,7 @@ import { Upload, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Photo } from "./photo-gallery";
 import { createClient } from "@/lib/supabase/client";
+import imageCompression from "browser-image-compression";
 
 interface PhotoUploadZoneProps {
   onPhotosUploaded: (photos: Photo[]) => void;
@@ -31,16 +32,44 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
 
         const newPhotos: Photo[] = await Promise.all(
           acceptedFiles.map(async (file) => {
+            const options = {
+              maxSizeMB: 1, // Tamanho máximo de 1MB
+              maxWidthOrHeight: 1920, // Dimensão máxima de 1920px (Full HD)
+              useWebWorker: true, // Usar Web Worker para não travar a UI
+              fileType: file.type, // Manter o tipo original
+              initialQuality: 0.85, // Qualidade inicial de 85% (ótimo balanço)
+            };
+
+            console.log(`Comprimindo imagem ${file.name}...`);
+            console.log(
+              `Tamanho original: ${(file.size / 1024 / 1024).toFixed(2)}MB`
+            );
+
+            const compressedFile = await imageCompression(file, options);
+
+            console.log(
+              `Tamanho comprimido: ${(
+                compressedFile.size /
+                1024 /
+                1024
+              ).toFixed(2)}MB`
+            );
+            console.log(
+              `Redução: ${(
+                ((file.size - compressedFile.size) / file.size) *
+                100
+              ).toFixed(1)}%`
+            );
+
             // Gerar nome único para o arquivo
             const fileExt = file.name.split(".").pop();
             const fileName = `${user.id}/${Date.now()}-${Math.random()
               .toString(36)
               .substring(7)}.${fileExt}`;
 
-            // Upload para o Supabase Storage
             const { data, error } = await supabase.storage
               .from("photos")
-              .upload(fileName, file);
+              .upload(fileName, compressedFile);
 
             if (error) {
               console.error("Erro ao fazer upload:", error);
@@ -59,7 +88,7 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
               id,
               url,
               name: file.name,
-              size: file.size,
+              size: compressedFile.size,
               uploadedAt: new Date(),
               userId: user.id,
             };
@@ -79,7 +108,7 @@ export function PhotoUploadZone({ onPhotosUploaded }: PhotoUploadZoneProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".heic"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
     },
     multiple: true,
   });
