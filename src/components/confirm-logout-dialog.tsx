@@ -12,29 +12,31 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 export function ConfirmLogoutDialog() {
   const { signOut } = useAuth();
+  const { setOpen } = useSidebar();
 
   const handleConfirmLogout = async () => {
     const result = await signOut();
+
     if (!result.success) {
       toast.error("Erro ao desconectar", {
         description: result.error,
       });
+      return;
     }
+
+    setOpen(false);
   };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-transparent border-white font-semibold hover:bg-white/10 cursor-pointer hover:text-white"
-        >
+        <Button variant="outline" size="sm">
           👋 Sair
         </Button>
       </AlertDialogTrigger>

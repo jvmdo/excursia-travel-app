@@ -1,6 +1,6 @@
 import { PhotoGallery } from "@/features/photos/components/photo-gallery";
 import { ImageIcon } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function HomePage() {
   return (
@@ -11,17 +11,12 @@ export default function HomePage() {
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
               <ImageIcon className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
-                Excursia
-              </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">
-                Olá!
-              </p>
-            </div>
+            <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
+              Excursia
+            </h1>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <SidebarTrigger />
           </div>
         </div>
       </header>
