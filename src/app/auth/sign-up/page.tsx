@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -25,6 +26,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { TermsOfService } from "@/components/terms-of-service";
 
 const SUPABASE_REDIRECT_URL =
   process.env.NEXT_PUBLIC_APP_URL || `${window.location.origin}/criar-roteiro`;
@@ -179,6 +181,13 @@ export default function SignUpPage() {
             </FieldGroup>
           </form>
         </CardContent>
+
+        <CardFooter>
+          <div className="text-center text-gray-400 text-sm">
+            Ao clicar em continuar, você concorda com os nossos{" "}
+            <TermsOfService />.
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );
