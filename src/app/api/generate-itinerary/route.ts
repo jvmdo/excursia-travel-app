@@ -55,8 +55,6 @@ export async function POST(request: NextRequest) {
       }
     );
     const content = response.choices[0].message.content ?? "{}";
-    // console.log(response);
-    // console.log(content);
     const groqChoices = JSON.parse(content);
     const itineraryData: ItineraryData = {
       id: response.id,
@@ -76,7 +74,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(parsed.data);
   } catch (err) {
     console.error(err);
-    let message = "Algo deu errado. Tente novamente mais tarde.";
+    let message =
+      "Serviço temporariamente indisponível. Tente novamente mais tarde.";
 
     if (err instanceof Groq.APIError) {
       message = dedent`
@@ -139,7 +138,7 @@ async function getGroqChatCompletion(prompt: string) {
       type: "json_schema",
       json_schema: {
         name: "detailed_trip_itinerary",
-        strict: true,
+        strict: false,
         schema: z.toJSONSchema(
           ItineraryDataSchema.omit({ id: true, createdAt: true })
         ),

@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import AnnButton from "@/features/itinerary/components/ann-button";
 import { generateItinerary } from "@/features/itinerary/api/generate-itinerary";
+import { toast } from "sonner";
 
 const ItineraryFormSchema = z.object({
   days: z.coerce
@@ -45,14 +46,15 @@ export function ItineraryForm({
   setItinerary,
   saveItinerary,
 }: ItineraryFormProps) {
-  const { handleSubmit, control, formState, reset, setError } = useForm({
-    resolver: zodResolver(ItineraryFormSchema),
-    defaultValues: {
-      days: 0,
-      destination: "",
-      preferences: "",
-    },
-  });
+  const { handleSubmit, control, formState, reset, setError, clearErrors } =
+    useForm({
+      resolver: zodResolver(ItineraryFormSchema),
+      defaultValues: {
+        days: 0,
+        destination: "",
+        preferences: "",
+      },
+    });
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
   const handleGenerateItinerary = async (data: ItineraryFormValues) => {
@@ -61,7 +63,11 @@ export function ItineraryForm({
       setTimeout(() => reset({}, { keepValues: true }), 5000);
       setItinerary(newItinerary);
       saveItinerary(newItinerary);
-    } catch {
+    } catch (err) {
+      // 3 attempts
+      if (formState.submitCount >= 2) {
+        toast.error((err as Error).message, { position: "top-right" });
+      }
       setError("root.api", { type: "API Error" });
     }
   };
@@ -79,6 +85,12 @@ export function ItineraryForm({
       btnRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [status, btnRef]);
+
+  const clearFormApiError = () => {
+    if (status === "error") {
+      clearErrors("root");
+    }
+  };
 
   return (
     <Card className="gap-4 mb-4">
@@ -109,6 +121,10 @@ export function ItineraryForm({
                       placeholder="Porto de galinhas em Ipojuca, Pernambuco"
                       autoComplete="off"
                       aria-invalid={fieldState.invalid}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        clearFormApiError();
+                      }}
                     />
                   </div>
                   {fieldState.invalid && (
@@ -139,6 +155,10 @@ export function ItineraryForm({
                       autoComplete="off"
                       aria-invalid={fieldState.invalid}
                       value={field.value || ""} // Make sure placeholder is shown
+                      onChange={(e) => {
+                        field.onChange(e);
+                        clearFormApiError();
+                      }}
                     />
                   </div>
                   {fieldState.invalid && (
@@ -168,6 +188,10 @@ export function ItineraryForm({
                       rows={3}
                       maxLength={60}
                       aria-invalid={fieldState.invalid}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        clearFormApiError();
+                      }}
                     />
                     {field.value && (
                       <InputGroupText

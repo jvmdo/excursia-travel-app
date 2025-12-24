@@ -2,8 +2,10 @@
 
 ## TODO
 
-- Embed photos
-  - Themes
+- CSS
+  - Use theme tokens instead of hardcoded styles in itineraries
+    - Fonts, colors, custom gradients, what else?
+  - Theme button
 
 - Photos
   - New album button: display toast with instructions
@@ -15,6 +17,7 @@
 - PDF features?
   - Rename it to itinerary-pdf
   - Maybe merge with album pdf?
+  - Is 2 different PDF libraries needed?
   
 - Rename routes
   - criar-roteiro -> roteiros
