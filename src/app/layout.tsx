@@ -25,10 +25,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon.png",
+        url: "/logo-excursia.png",
+        type: "image/png",
+      },
+      {
+        url: "/android-chrome-192x192.png",
+        type: "image/png",
+      },
+      {
+        url: "/android-chrome-512x512.png",
         type: "image/png",
       },
     ],
+    apple: "/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,

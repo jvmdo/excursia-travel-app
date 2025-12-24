@@ -1,4 +1,4 @@
-import { BookImage, BotMessageSquare, Plane } from "lucide-react";
+import { BookImage, BotMessageSquare, MonitorDown, Plane } from "lucide-react";
 
 import {
   Sidebar,
@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/sidebar";
 import { ConfirmLogoutDialog } from "@/components/confirm-logout-dialog";
 import Link from "next/link";
+import { AppShortcutInstructions } from "@/components/app-shortcut-instructions";
 
-const items = [
+const navItems = [
   {
     title: "Gerador de itinerários",
     url: "/criar-roteiro",
@@ -25,6 +26,13 @@ const items = [
     title: "Criação de álbuns",
     url: "/fotos",
     icon: BookImage,
+  },
+];
+
+const configItems = [
+  {
+    title: "Adicionar à tela inicial",
+    icon: MonitorDown,
   },
 ];
 
@@ -47,13 +55,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Para suas viagens</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Facilidades</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {configItems.map(({ title, icon: Icon }) => (
+                <SidebarMenuItem key={title}>
+                  <SidebarMenuButton asChild>
+                    <AppShortcutInstructions>
+                      <Icon /> {title}
+                    </AppShortcutInstructions>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

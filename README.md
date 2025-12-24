@@ -3,8 +3,6 @@
 ## TODO
 
 - Embed photos
-  - EULA
-  - PWA
   - Themes
 
 - Photos
@@ -21,9 +19,6 @@
 - Rename routes
   - criar-roteiro -> roteiros
   - fotos -> albuns
-
-- Supabase
-  - Email template
 
 - OnProfit Webhook API
   - Supabase invite links?
