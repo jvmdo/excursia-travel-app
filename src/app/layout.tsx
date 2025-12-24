@@ -1,11 +1,19 @@
 import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Sora, Inter } from "next/font/google";
 import { Toaster } from "sonner";
 
-const appFont = Inter({
+const sora = Sora({
   subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -68,13 +76,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={appFont.className}>
+    <html lang="pt-BR" className={`${sora.variable} ${inter.variable}`}>
       <head>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
         />
-        <meta name="theme-color" content="#0ea5e9" />
       </head>
       <body className={`font-sans antialiased`}>
         {children}

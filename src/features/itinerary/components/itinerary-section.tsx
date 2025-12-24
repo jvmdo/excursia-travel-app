@@ -63,12 +63,12 @@ export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="itinerary-header mb-4">
-          <h2 className="destination-title text-2xl font-bold flex flex-col items-center gap-2">
+        <div className="text-center border-b-4 border-sky-500 rounded-xs pb-7.5 mb-7.5 animate-slide-down">
+          <h2 className="text-2xl font-bold text-sky-500 flex flex-col items-center gap-2 mb-2">
             <MapPinned size={32} />
             {itinerary.destination}
           </h2>
-          <p className="itinerary-meta text-sm text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground">
             {itinerary.numberOfDays} dias • Gerado em{" "}
             {itinerary.createdAt &&
               new Date(itinerary.createdAt * 1000).toLocaleDateString(
