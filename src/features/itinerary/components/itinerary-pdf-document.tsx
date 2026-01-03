@@ -2,36 +2,13 @@
 
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { removeEmojis } from "@/features/itinerary/utils";
-import {
-  Document,
-  Page,
-  View,
-  Text,
-  StyleSheet,
-  Font,
-  PDFViewer,
-} from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { marked } from "marked";
 import { ReactElement } from "react";
-
-export const pdfFont = "Noto Sans";
-const regularFont = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/NotoSans-Regular.ttf`;
-const boldFont = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/NotoSans-Bold.ttf`;
-const italicFont = `${process.env.NEXT_PUBLIC_APP_URL}/fonts/NotoSans-Italic.ttf`;
-
-Font.register({
-  family: pdfFont,
-  fonts: [
-    { src: regularFont, fontWeight: "normal" },
-    { src: boldFont, fontWeight: "bold" },
-    { src: italicFont, fontStyle: "italic" },
-  ],
-});
 
 const styles = StyleSheet.create({
   page: {
     color: "black",
-    fontFamily: pdfFont,
     padding: 48,
     fontSize: 12,
   },
@@ -135,57 +112,55 @@ export default function ItineraryPdfDocument({
   };
 
   return (
-    <PDFViewer width="100%" height="100%">
-      <Document
-        title="Roteiro PDF | TravelApp"
-        author="TravelApp by Excursia Viagens"
-        subject="Itinerário de viagem"
-        keywords="roteiro, itinerário, viagem, travelapp"
-      >
-        <Page size="A4" style={styles.page}>
-          <View>
-            <Text style={styles.title}>{cleanItinerary.destination}</Text>
-            <Text style={styles.meta}>
-              {cleanItinerary.numberOfDays} dias • Gerado em{" "}
-              {cleanItinerary.createdAt} • Valores em R$
+    <Document
+      title="Roteiro PDF | TravelApp"
+      author="TravelApp by Excursia Viagens"
+      subject="Itinerário de viagem"
+      keywords="roteiro, itinerário, viagem, travelapp"
+    >
+      <Page size="A4" style={styles.page}>
+        <View>
+          <Text style={styles.title}>{cleanItinerary.destination}</Text>
+          <Text style={styles.meta}>
+            {cleanItinerary.numberOfDays} dias • Gerado em{" "}
+            {cleanItinerary.createdAt} • Valores em R$
+          </Text>
+        </View>
+
+        {cleanItinerary.dayItineraries.map((day) => (
+          <View key={day.day} style={styles.daySection}>
+            <Text style={styles.dayTitle}>
+              Dia {day.day} — {day.title}
             </Text>
-          </View>
 
-          {cleanItinerary.dayItineraries.map((day) => (
-            <View key={day.day} style={styles.daySection}>
-              <Text style={styles.dayTitle}>
-                Dia {day.day} — {day.title}
-              </Text>
+            <View>
+              {day.activities.map((act, i) => (
+                <Text key={i} style={styles.listItem}>
+                  • <InlineMdToPdfComponents md={act} />
+                </Text>
+              ))}
+            </View>
 
+            {day.tips && day.tips.length > 0 && (
               <View>
-                {day.activities.map((act, i) => (
+                <Text style={styles.tipsHeader}>Dicas</Text>
+                {day.tips.map((tip, i) => (
                   <Text key={i} style={styles.listItem}>
-                    • <InlineMdToPdfComponents md={act} />
+                    {`${i + 1}.`} <InlineMdToPdfComponents md={tip} />
                   </Text>
                 ))}
               </View>
-
-              {day.tips && day.tips.length > 0 && (
-                <View>
-                  <Text style={styles.tipsHeader}>Dicas</Text>
-                  {day.tips.map((tip, i) => (
-                    <Text key={i} style={styles.listItem}>
-                      {`${i + 1}.`} <InlineMdToPdfComponents md={tip} />
-                    </Text>
-                  ))}
-                </View>
-              )}
-            </View>
-          ))}
-
-          <View style={styles.footer}>
-            <Text>
-              Roteiro gerado por TravelApp by Excursia Viagens •{" "}
-              {new Date().toLocaleDateString("pt-BR")}
-            </Text>
+            )}
           </View>
-        </Page>
-      </Document>
-    </PDFViewer>
+        ))}
+
+        <View style={styles.footer}>
+          <Text>
+            Roteiro gerado por TravelApp by Excursia Viagens •{" "}
+            {new Date().toLocaleDateString("pt-BR")}
+          </Text>
+        </View>
+      </Page>
+    </Document>
   );
 }

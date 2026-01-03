@@ -2,6 +2,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,10 +23,13 @@ function ThankYouDialog({ children, open, onOpenChange }: ThankYouDialogProps) {
             <span className="text-5xl animate-bounce">🎉</span>
             Obrigado por usar nosso app!
           </DialogTitle>
-          <DialogDescription className="text-center text-base pt-2">
-            Esperamos que seu roteiro seja incrível e sua viagem inesquecível!
-          </DialogDescription>
         </DialogHeader>
+        <DialogDescription className="text-center text-base pt-2">
+          Esperamos que seu roteiro seja incrível e sua viagem inesquecível!
+        </DialogDescription>
+        <DialogFooter className="text-center text-sm bg-muted">
+          Seu roteiro está sendo gerado ⚙️
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

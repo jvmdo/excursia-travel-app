@@ -1,12 +1,15 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MarkdownRenderer } from "@/features/itinerary/components/markdown-renderer";
+import React from "react";
+
 import { ItineraryData } from "@/app/api/generate-itinerary/route";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ItineraryPdfDocument from "@/features/itinerary/components/itinerary-pdf-document";
+import { MarkdownRenderer } from "@/features/itinerary/components/markdown-renderer";
 import ThankYouDialog from "@/features/itinerary/components/thank-you-dialog";
+import { pdf } from "@react-pdf/renderer";
 import { MapPinned } from "lucide-react";
 import { toast } from "sonner";
-import React from "react";
 
 interface ItinerarySectionProps {
   itinerary: ItineraryData;
@@ -17,25 +20,25 @@ export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
 
   const handleGeneratePdf = async (itinerary: ItineraryData) => {
     try {
-      const res = await fetch("/api/pdf-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(itinerary),
+      const blob = await pdf(
+        <ItineraryPdfDocument itinerary={itinerary} />
+      ).toBlob();
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `roteiro-${itinerary.destination}-${itinerary.createdAt}.pdf`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Falha ao gerar PDF", {
+        description: JSON.stringify(error),
       });
-
-      if (!res.ok) {
-        setOpen(false);
-        toast.error("Falha ao gerar PDF", {
-          description:
-            "Atualize a página, recupere seu itinerário dentre os armazenados e tente novamente.",
-        });
-        return;
-      }
-
-      const { sessionId } = await res.json();
-      setTimeout(() => window.open(`/criar-roteiro/pdf/${sessionId}`), 1000);
-    } catch (err) {
-      console.error(err);
+    } finally {
+      setOpen(false);
     }
   };
 
@@ -49,7 +52,9 @@ export function ItinerarySection({ itinerary }: ItinerarySectionProps) {
           <ThankYouDialog open={open} onOpenChange={setOpen}>
             <button
               className="transition-all hover:scale-105 cursor-pointer w-28"
-              onClick={() => handleGeneratePdf(itinerary)}
+              onClick={() =>
+                setTimeout(() => handleGeneratePdf(itinerary), 1000)
+              }
             >
               <div className="p-0.5 bg-linear-to-r from-sky-400 to-purple-400 rounded-lg">
                 <div className="p-0.5 rounded-md bg-white">
