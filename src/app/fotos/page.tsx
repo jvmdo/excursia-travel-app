@@ -1,8 +1,8 @@
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PhotoGallery } from "@/features/photos/components/photo-gallery";
 import { ImageIcon } from "lucide-react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
-export default function HomePage() {
+export default function Page() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">

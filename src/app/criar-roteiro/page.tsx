@@ -1,18 +1,8 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-
-import { ItineraryContainer } from "@/features/itinerary/itinerary-container";
-import ChatWidgetContainer from "@/features/chat/chat-widget-container";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import ChatWidgetContainer from "@/features/chat/chat-widget-container";
+import { ItineraryContainer } from "@/features/itinerary/itinerary-container";
 
-export default async function AppPage() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data?.user) {
-    redirect("/auth/login");
-  }
-
+export default async function Page() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-cyan-50 to-orange-50">
       <header className="bg-linear-to-r from-sky-500 via-cyan-400 to-purple-400 text-white py-8 px-4 text-center relative">
