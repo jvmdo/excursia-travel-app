@@ -1,20 +1,11 @@
-import { useState, useMemo, useEffect, ComponentPropsWithRef } from "react";
+import dynamic from "next/dynamic";
+import React from "react";
 
-import {
-  generateNodes,
-  getNodePosition,
-} from "@/features/itinerary/components/ann-button/helpers";
+import AnimationProcessing from "@/features/itinerary/components/ann-button/components/animation-processing";
+import { ShadowGlow } from "@/features/itinerary/components/ann-button/components/shadow-glow";
 import { StatusIcon } from "@/features/itinerary/components/ann-button/components/status-icon";
 import { cn } from "@/lib/utils";
-import { ExpandingRings } from "@/features/itinerary/components/ann-button/components/expanding-rings";
-import { ShadowGlow } from "@/features/itinerary/components/ann-button/components/shadow-glow";
-import dynamic from "next/dynamic";
 
-const AnnNode = dynamic(() => import("./components/ann-node"), { ssr: false });
-const AnimationProcessing = dynamic(
-  () => import("./components/animation-processing"),
-  { ssr: false }
-);
 const AnimationSuccess = dynamic(
   () => import("./components/animation-success"),
   { ssr: false }
@@ -22,28 +13,16 @@ const AnimationSuccess = dynamic(
 
 export type TButtonStatus = "idle" | "processing" | "success" | "error";
 
-interface AnnButtonProps extends ComponentPropsWithRef<"button"> {
+interface AnnButtonProps extends React.ComponentPropsWithRef<"button"> {
   status: TButtonStatus;
 }
 
 function AnnButton({ ref, status }: AnnButtonProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [time, setTime] = useState(0);
-  const nodes = useMemo(() => generateNodes(), []);
+  const [isHovering, setIsHovering] = React.useState(false);
 
   const isProcessing = status === "processing";
   const isIdle = status === "idle";
   const isClickable = isIdle || status === "error";
-
-  useEffect(() => {
-    if (!isHovered && !isProcessing) return;
-
-    const interval = setInterval(() => {
-      setTime((t) => t + 0.05);
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, [isHovered, isProcessing]);
 
   const getButtonText = (): string => {
     switch (status) {
@@ -72,56 +51,25 @@ function AnnButton({ ref, status }: AnnButtonProps) {
   return (
     <button
       ref={ref}
-      className="relative w-full"
       disabled={!isClickable}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        height: isProcessing ? "150px" : "48px",
-        transition: "height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
-      }}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      className={cn(
+        "relative w-full h-12 rounded-2xl font-semibold bg-linear-to-r text-white",
+        getButtonColor(),
+        isClickable ? "cursor-pointer" : "cursor-default",
+        isProcessing ? "cursor-progress" : ""
+      )}
     >
-      <div
-        className={cn(
-          `relative z-10 px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-500 
-          overflow-hidden h-full bg-linear-to-r ${getButtonColor()} text-white`,
-          isClickable ? "cursor-pointer hover:shadow-2xl" : "cursor-default",
-          isProcessing ? "cursor-wait" : ""
-        )}
-      >
-        <span
-          className={`
-              relative z-20 flex items-center gap-3 left-1/2 top-1/2 -translate-1/2 w-fit 
-              text-sm min-[24rem]:text-base min-[30rem]:text-lg
-              drop-shadow-[0_0.5px_0.5px_rgba(0,0,0,0.8)]
-          `}
-        >
-          <StatusIcon status={status} />
-          {getButtonText()}
-        </span>
-
-        {(isIdle || isProcessing) &&
-          nodes.map((node, i) => {
-            const pos = getNodePosition(node, time, isHovered, isProcessing);
-            return (
-              <AnnNode
-                key={`node-${i}`}
-                node={node}
-                position={pos}
-                isProcessing={isProcessing}
-                index={i}
-              />
-            );
-          })}
-
-        <AnimationProcessing display={isProcessing} nodes={nodes} time={time} />
-        <AnimationSuccess display={status === "success"} />
-      </div>
-
-      <ExpandingRings display={isProcessing} />
+      <span className="relative z-10 flex items-center justify-center gap-3 text-sm min-[24rem]:text-base min-[30rem]:text-lg drop-shadow-[0_0.5px_0.5px_rgba(0,0,0,0.8)]">
+        <StatusIcon status={status} />
+        {getButtonText()}
+      </span>
+      <AnimationProcessing display={isProcessing} />
+      <AnimationSuccess display={status === "success"} />
       <ShadowGlow
         color={getButtonColor()}
-        isHovered={isHovered}
+        isHovering={isHovering}
         status={status}
       />
     </button>

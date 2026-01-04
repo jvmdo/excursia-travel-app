@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { ItineraryData } from "@/app/api/generate-itinerary/route";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Field,
@@ -12,18 +10,20 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
+import { generateItinerary } from "@/features/itinerary/api/generate-itinerary";
+import AnnButton from "@/features/itinerary/components/ann-button";
 import { PreferencesTemplates } from "@/features/itinerary/components/template-selector";
 import { cn } from "@/lib/utils";
-import { ItineraryData } from "@/app/api/generate-itinerary/route";
-import AnnButton from "@/features/itinerary/components/ann-button";
-import { generateItinerary } from "@/features/itinerary/api/generate-itinerary";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import z from "zod";
 
 const ItineraryFormSchema = z.object({
   days: z.coerce
@@ -60,7 +60,6 @@ export function ItineraryForm({
   const handleGenerateItinerary = async (data: ItineraryFormValues) => {
     try {
       const newItinerary = await generateItinerary(data);
-      setTimeout(() => reset({}, { keepValues: true }), 5000);
       setItinerary(newItinerary);
       saveItinerary(newItinerary);
     } catch (err) {
@@ -71,6 +70,12 @@ export function ItineraryForm({
       setError("root.api", { type: "API Error" });
     }
   };
+
+  const { isSubmitSuccessful } = formState;
+  const resetForm = useEffectEvent(() => reset());
+  useEffect(() => {
+    setTimeout(() => resetForm(), 5000);
+  }, [isSubmitSuccessful]);
 
   const status = formState.errors.root?.api
     ? "error"
