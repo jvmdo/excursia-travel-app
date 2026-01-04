@@ -52,10 +52,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages to the app
-  if (user && request.nextUrl.pathname.startsWith("/auth")) {
+  // Redirect authenticated users away from home to the app
+  if (user && request.nextUrl.pathname === "/") {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/criar-roteiro";
     return NextResponse.redirect(url);
   }
 
