@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { TermsOfService } from "@/components/terms-of-service";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,14 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { translateSupabaseError } from "@/lib/utils";
 import {
   Field,
   FieldDescription,
@@ -25,8 +17,16 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { TermsOfService } from "@/components/terms-of-service";
+import { createClient } from "@/lib/supabase/client";
+import { translateSupabaseError } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
 
 const SUPABASE_REDIRECT_URL =
   process.env.NEXT_PUBLIC_APP_URL || `${window.location.origin}/criar-roteiro`;
@@ -57,6 +57,24 @@ export default function SignUpPage() {
   });
 
   const handleSignUp = async (data: SignUpFormValues) => {
+    const { count, error: errorCustomer } = await supabase
+      .from("customers")
+      .select("*", { count: "exact", head: true })
+      .ilike("email", data.email);
+
+    if (errorCustomer) {
+      console.log(errorCustomer);
+      toast.error("Falha ao buscar email inserido");
+      return;
+    }
+
+    if (count === 0) {
+      toast.warning("Email não reconhecido", {
+        description: "Registre com o mesmo email usado na compra do app",
+      });
+      return;
+    }
+
     const { error } = await supabase.auth.signUp({
       ...data,
       options: {
@@ -65,6 +83,7 @@ export default function SignUpPage() {
     });
 
     if (error) {
+      console.log(error);
       toast.error("Falha ao criar conta", {
         description: translateSupabaseError(error),
       });

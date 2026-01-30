@@ -5,12 +5,14 @@
 - PDF features?
   - Are X different PDF libraries needed?
 
-- Form
-  - Lagging?
-  - Button lagging for sure
+- Chat
+  - Behind sidebar on desktop (when open)
 
-- Performance
-  - Supabase client increases page load time by 160ms
+- Thank you modal
+  - Download message centering
+
+- Home page
+  - Title line height
 
 - CSS
   - Use theme tokens instead of hardcoded styles in itineraries
@@ -28,9 +30,6 @@
   - criar-roteiro -> roteiros
   - fotos -> albuns
 
-- OnProfit Webhook API
-  - Supabase invite links?
-
 - Itinerary list
   - Feat: database
   
@@ -38,11 +37,6 @@
   - Remember me
   - Forgot password
   - No need for email verification if webhook is working
-
-- Vercel host
-  - excursia-travel.vercel.app
-  - excursia-roteiros-de-viagem.vercel.app
-  - excursia-itinerary-maker.vercel.app
 
 ## Learnings
 
